@@ -64,7 +64,18 @@ docker-compose up -d
 pnpm migrate
 ```
 
-### 5. Rodar o backend em desenvolvimento
+### 5. Popular o banco com dados de exemplo
+
+```bash
+pnpm seed
+```
+
+Isso criará:
+- 4 usuários (1 admin + 3 técnicos) - senha: `123456`
+- 14 serviços (8 finalizados + 6 em aberto)
+- Checklists, fotos e relatórios completos
+
+### 6. Rodar o backend em desenvolvimento
 
 ```bash
 pnpm dev:backend
@@ -83,6 +94,17 @@ pnpm dev
 | `CLOUDINARY_API_KEY` | Chave de API do Cloudinary |
 | `CLOUDINARY_API_SECRET` | Segredo de API do Cloudinary |
 | `PORT` | Porta do servidor (padrão: 3001) |
+
+## Credenciais de Acesso (após seed)
+
+Todos os usuários criados pelo seed têm a senha: **`123456`**
+
+| Email | Role | Nome |
+|---|---|---|
+| `admin@fieldreport.com` | Admin | Administrador |
+| `joao.silva@fieldreport.com` | Técnico | João Silva |
+| `maria.santos@fieldreport.com` | Técnico | Maria Santos |
+| `pedro.oliveira@fieldreport.com` | Técnico | Pedro Oliveira |
 
 ## Endpoints da API
 
