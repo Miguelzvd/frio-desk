@@ -1,0 +1,17 @@
+{
+  "name": "@field-report/shared",
+  "version": "1.0.0",
+  "description": "Tipos e interfaces TypeScript compartilhados entre os pacotes do monorepo",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.22.0",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
