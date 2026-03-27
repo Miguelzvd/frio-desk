@@ -1,5 +1,20 @@
 import { Request, Response } from "express"
 import * as photosService from "./photos.service"
+import * as photosRepository from "./photos.repository"
+
+export async function getPhotos(req: Request, res: Response): Promise<void> {
+  try {
+    const photos = await photosRepository.findPhotosByServiceId(
+      req.params.id as string,
+    )
+    res.json(photos)
+  } catch (err) {
+    const error = err as Error & { statusCode?: number }
+    res
+      .status(error.statusCode ?? 500)
+      .json({ error: error.message, statusCode: error.statusCode ?? 500 })
+  }
+}
 
 export async function uploadPhoto(req: Request, res: Response): Promise<void> {
   try {

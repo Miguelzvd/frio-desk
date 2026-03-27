@@ -19,6 +19,7 @@ const upload = multer({
 
 router.use(authMiddleware)
 
+router.get("/", photosController.getPhotos)
 router.post("/", upload.single("photo"), photosController.uploadPhoto)
 
 export default router
