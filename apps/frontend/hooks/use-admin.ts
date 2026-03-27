@@ -89,7 +89,7 @@ export function useAdminMetrics() {
   const fetch = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await api.get<AdminMetrics>("/admin/metrics")
+      const res = await api.get<AdminMetrics>("services/metrics")
       setMetrics(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
