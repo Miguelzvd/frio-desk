@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { use } from "react";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, FileText, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +22,6 @@ interface Props {
 
 export default function ServiceDetailPage({ params }: Props) {
   const { id } = use(params);
-  const router = useRouter();
   const { service, loading, refetch } = useServiceDetail(id);
   const { toggleItem } = useToggleChecklist();
   const { finishService, loading: finishing } = useFinishService();

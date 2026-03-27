@@ -31,7 +31,7 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="flex h-screen w-60 flex-shrink-0 flex-col border-r border-border bg-sidebar">
+    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-border bg-sidebar">
       <div className="flex h-16 items-center gap-2 border-b border-border px-5">
         <div className="flex size-8 items-center justify-center rounded-md bg-primary">
           <Wind className="size-4 text-primary-foreground" />
