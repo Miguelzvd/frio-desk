@@ -1,26 +1,34 @@
 "use client";
 
-import { useRef } from "react";
-import Link from "next/link";
+import { useRef, useState } from "react";
 import { Loader2, Plus, Wind } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ServiceCard } from "@/components/services/service-card";
 import { useServices } from "@/hooks/use-services";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { CreateServiceModal } from "@/components/services/create-service-modal";
 
 export default function DashboardPage() {
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useServices();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isError,
+  } = useServices();
 
   const services = data?.pages.flatMap((p) => p.data) ?? [];
   const total = data?.pages[0]?.total ?? 0;
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
   useIntersectionObserver(
     sentinelRef,
     fetchNextPage,
-    hasNextPage && !isFetchingNextPage,
+    hasNextPage && !isFetchingNextPage && !isError,
   );
 
   return (
@@ -54,7 +62,8 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <Button nativeButton={false} render={<Link href="/services/new" />}>
+            {/* BOTÃO MUDADO AQUI */}
+            <Button onClick={() => setIsModalOpen(true)}>
               <Plus className="size-4" />
               Novo serviço
             </Button>
@@ -78,17 +87,19 @@ export default function DashboardPage() {
           </>
         )}
 
-        {/* FAB */}
+        {/* FAB MUDADO AQUI */}
         {services.length > 0 && (
-          <Link
-            href="/services/new"
-            className="fixed bottom-20 right-4 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="fixed bottom-20 right-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
             aria-label="Novo serviço"
           >
             <Plus className="size-6" />
-          </Link>
+          </button>
         )}
       </div>
+
+      <CreateServiceModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
   );
 }
