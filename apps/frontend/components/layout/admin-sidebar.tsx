@@ -59,7 +59,7 @@ export function AdminSidebar({ mobileOpen, onClose }: AdminSidebarProps) {
             <Wind className="size-4 text-primary-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading text-sm font-bold leading-none">FieldReport</p>
+            <p className="font-heading text-sm font-bold leading-none">FrioDesk</p>
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
               Admin
             </p>

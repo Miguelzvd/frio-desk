@@ -22,7 +22,7 @@ import {
 import { ExternalLink } from "lucide-react";
 import { SERVICE_TYPE_LABELS, SERVICE_STATUS_LABELS } from "@/lib/constants";
 import type { AdminService } from "@/hooks/use-admin";
-import type { ServiceType, ServiceStatus } from "@field-report/shared";
+import type { ServiceType, ServiceStatus } from "@friodesk/shared";
 import { cn } from "@/lib/utils";
 
 interface ServicesTableProps {

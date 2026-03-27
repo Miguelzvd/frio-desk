@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MetricsCard } from "@/components/admin/metrics-card";
 import { useAdminMetrics } from "@/hooks/use-admin";
 import { SERVICE_TYPE_LABELS } from "@/lib/constants";
-import type { ServiceType } from "@field-report/shared";
+import type { ServiceType } from "@friodesk/shared";
 
 const CHART_COLORS = [
   "var(--color-chart-1)",

@@ -11,7 +11,7 @@ import {
   PhotoSelect,
   users,
 } from "../../db/schema";
-import type { PaginatedResponse } from "@field-report/shared";
+import type { PaginatedResponse } from "@friodesk/shared";
 
 export interface ServiceWithUser extends ServiceSelect {
   user: { id: string; name: string; email: string }

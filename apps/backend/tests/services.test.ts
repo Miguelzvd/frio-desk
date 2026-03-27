@@ -1,6 +1,7 @@
 import * as servicesService from "../src/modules/services/services.service"
 import * as servicesRepository from "../src/modules/services/services.repository"
 import { describe, it, expect, beforeEach, jest } from '@jest/globals'
+import { UserRole } from "@friodesk/shared"
 
 jest.mock("../src/modules/services/services.repository")
 jest.mock("../src/db", () => ({ db: {} }))
@@ -16,6 +17,7 @@ const fakeService = {
   type: "preventiva" as const,
   status: "open" as const,
   createdAt: new Date(),
+  notes: "test",
   finishedAt: null,
 }
 
@@ -68,21 +70,21 @@ describe("Services Service", () => {
   })
 
   describe("listServices", () => {
-    it("deve listar apenas serviços do usuário autenticado", async () => {
-      const outroUserId = "outro-user-uuid"
-      const servicesDoUsuario = [fakeService]
-      const servicesDeOutro = [{ ...fakeService, id: "other-service", userId: outroUserId }]
+    it("deve listar apenas serviços do usuário autenticado paginados", async () => {
+      // O mock agora precisa retornar o formato de PaginatedResponse
+      const paginatedResult = {
+        data: [fakeService],
+        nextCursor: null,
+        total: 1
+      }
 
-      mockRepo.findServicesByUserId.mockImplementation(async (id: string) => {
-        if (id === userId) return servicesDoUsuario
-        return servicesDeOutro
-      })
+      mockRepo.findServicesByUserIdPaginated.mockResolvedValue(paginatedResult)
 
-      const result = await servicesService.listServices(userId)
+      const result = await servicesService.listServices(userId, "technician" as UserRole, {})
 
-      expect(result).toHaveLength(1)
-      expect(result[0].userId).toBe(userId)
-      expect(mockRepo.findServicesByUserId).toHaveBeenCalledWith(userId)
+      expect(result.data).toHaveLength(1)
+      expect(result.data[0].userId).toBe(userId)
+      expect(mockRepo.findServicesByUserIdPaginated).toHaveBeenCalledWith(userId, undefined, 8)
     })
   })
 
@@ -91,7 +93,7 @@ describe("Services Service", () => {
       mockRepo.findServiceByIdAndUserId.mockResolvedValue(undefined)
 
       await expect(
-        servicesService.getServiceDetail("id-inexistente", userId)
+        servicesService.getServiceDetail("id-inexistente", userId, "technician" as UserRole)
       ).rejects.toMatchObject({ message: "Serviço não encontrado", statusCode: 404 })
     })
 
@@ -100,7 +102,8 @@ describe("Services Service", () => {
       mockRepo.findChecklistByServiceId.mockResolvedValue(fakeChecklist)
       mockRepo.findPhotosByServiceId.mockResolvedValue([])
 
-      const result = await servicesService.getServiceDetail(serviceId, userId)
+      // Adicionando o parâmetro de role
+      const result = await servicesService.getServiceDetail(serviceId, userId, "technician" as UserRole)
 
       expect(result.id).toBe(serviceId)
       expect(result.checklist).toHaveLength(4)

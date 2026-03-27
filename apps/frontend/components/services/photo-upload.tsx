@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Camera, Loader2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePhotos, useUploadPhoto, useDeletePhoto } from "@/hooks/use-photos"
-import type { Photo } from "@field-report/shared"
+import type { Photo } from "@friodesk/shared"
 
 interface PhotoUploadProps {
   serviceId: string

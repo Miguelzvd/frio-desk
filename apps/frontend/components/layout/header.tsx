@@ -16,7 +16,7 @@ export function Header() {
             <Wind className="size-4 text-primary-foreground" />
           </div>
           <span className="font-heading font-bold text-sm tracking-wide">
-            FieldReport
+            FrioDesk
           </span>
         </Link>
 

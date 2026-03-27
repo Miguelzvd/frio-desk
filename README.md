@@ -1,8 +1,8 @@
-# Field Report
+# FrioDesk
 
 Equipes de manutenção de ar-condicionado enfrentam um problema recorrente: registrar serviços em campo de forma padronizada, sem papel, sem perda de informação e com evidência fotográfica. A comunicação entre técnico e gestor costuma ser informal — mensagens de WhatsApp, anotações avulsas, fotos soltas no celular — o que dificulta rastreabilidade, auditoria e padronização dos processos.
 
-**Field Report** resolve isso. É uma ferramenta web mobile-first onde o técnico abre o serviço no celular, preenche o checklist específico para aquele tipo de atendimento, registra fotos do equipamento e finaliza com um relatório estruturado. O gestor acompanha tudo pelo painel administrativo em tempo real, com visão completa de todos os técnicos e atendimentos.
+**FrioDesk** resolve isso. É uma ferramenta web mobile-first onde o técnico abre o serviço no celular, preenche o checklist específico para aquele tipo de atendimento, registra fotos do equipamento e finaliza com um relatório estruturado. O gestor acompanha tudo pelo painel administrativo em tempo real, com visão completa de todos os técnicos e atendimentos.
 
 ### O que o projeto entrega
 
@@ -32,7 +32,7 @@ O sistema possui duas interfaces independentes:
 ## Estrutura do Monorepo
 
 ```
-field-report/
+friodesk/
 ├── apps/
 │   ├── backend/          # API REST (Node.js + Express)
 │   └── frontend/         # Interface web (Next.js)
@@ -57,7 +57,7 @@ field-report/
 
 ```bash
 git clone <repo-url>
-cd field-report
+cd friodesk
 pnpm install
 ```
 
@@ -73,7 +73,7 @@ cp .env.example apps/backend/.env
 Para desenvolvimento local, o `.env` mínimo funcional é:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/fieldreport
+DATABASE_URL=postgresql://user:password@localhost:5432/friodesk
 JWT_SECRET=qualquer_string_longa_aqui
 JWT_REFRESH_SECRET=outra_string_longa_aqui
 PORT=3001
@@ -170,10 +170,10 @@ Todos os usuários criados pelo seed têm a senha: **`123456`**
 
 | Email                            | Role    | Nome           |
 | -------------------------------- | ------- | -------------- |
-| `admin@fieldreport.com`          | Admin   | Administrador  |
-| `joao.silva@fieldreport.com`     | Técnico | João Silva     |
-| `maria.santos@fieldreport.com`   | Técnico | Maria Santos   |
-| `pedro.oliveira@fieldreport.com` | Técnico | Pedro Oliveira |
+| `admin@friodesk.com`          | Admin   | Administrador  |
+| `joao.silva@friodesk.com`     | Técnico | João Silva     |
+| `maria.santos@friodesk.com`   | Técnico | Maria Santos   |
+| `pedro.oliveira@friodesk.com` | Técnico | Pedro Oliveira |
 
 ---
 

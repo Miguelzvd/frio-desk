@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import * as photosService from "../src/modules/photos/photos.service";
 import * as photosRepository from "../src/modules/photos/photos.repository";
 import * as servicesRepository from "../src/modules/services/services.repository";
-import type { StorageProvider, UploadResult } from "../src/storage/storage.interface";
+import type {
+  StorageProvider,
+  UploadResult,
+} from "../src/storage/storage.interface";
 
 jest.mock("../src/modules/photos/photos.repository");
 jest.mock("../src/modules/services/services.repository");
@@ -27,6 +30,7 @@ const fakeService = {
   type: "preventiva" as const,
   status: "open" as const,
   createdAt: new Date(),
+  notes: "test",
   finishedAt: null,
 };
 
@@ -34,20 +38,25 @@ const fakePhoto = {
   id: "photo-uuid-1",
   serviceId,
   url: "http://localhost/storage/foto.jpg",
-  publicId: "field-report/service-uuid-1/foto.jpg",
+  publicId: "friodesk/service-uuid-1/foto.jpg",
   createdAt: new Date(),
 };
 
 const fakeBuffer = Buffer.from("fake image content");
 
 beforeEach(() => {
-  jest.clearAllMocks()
-  const uploadResult: UploadResult = { url: fakePhoto.url, publicId: fakePhoto.publicId }
+  jest.clearAllMocks();
+  const uploadResult: UploadResult = {
+    url: fakePhoto.url,
+    publicId: fakePhoto.publicId,
+  };
   mockGetStorage.mockReturnValue({
-    upload: jest.fn<StorageProvider["upload"]>().mockResolvedValue(uploadResult),
+    upload: jest
+      .fn<StorageProvider["upload"]>()
+      .mockResolvedValue(uploadResult),
     delete: jest.fn<StorageProvider["delete"]>().mockResolvedValue(undefined),
-  } as StorageProvider)
-})
+  } as StorageProvider);
+});
 
 describe("Photos Service", () => {
   describe("uploadPhoto", () => {

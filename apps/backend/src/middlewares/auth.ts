@@ -1,4 +1,4 @@
-import { UserRole } from "@field-report/shared"
+import { UserRole } from "@friodesk/shared"
 import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
 

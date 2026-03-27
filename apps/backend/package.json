@@ -1,7 +1,7 @@
 {
-  "name": "@field-report/backend",
+  "name": "@friodesk/backend",
   "version": "1.0.0",
-  "description": "API REST do Field Report",
+  "description": "API REST do FrioDesk",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -17,7 +17,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.22.0",
   "dependencies": {
-    "@field-report/shared": "workspace:*",
+    "@friodesk/shared": "workspace:*",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.6",

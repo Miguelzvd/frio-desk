@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { toast } from "sonner"
 import axios from "axios"
 import api from "@/lib/api"
-import type { Photo } from "@field-report/shared"
+import type { Photo } from "@friodesk/shared"
 
 export function usePhotos(serviceId: string) {
   const [photos, setPhotos] = useState<Photo[]>([])

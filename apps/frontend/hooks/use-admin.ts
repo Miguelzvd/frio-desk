@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import axios from "axios"
 import api from "@/lib/api"
 import { buildCursorQuery } from "@/lib/pagination"
-import type { ServiceType, ChecklistItem, Photo, PaginatedResponse } from "@field-report/shared"
+import type { ServiceType, ChecklistItem, Photo, PaginatedResponse } from "@friodesk/shared"
 import type { ApiService } from "@/hooks/use-services"
 
 export interface AdminService extends ApiService {

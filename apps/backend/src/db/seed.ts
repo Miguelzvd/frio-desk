@@ -25,25 +25,25 @@ async function seed() {
       .values([
         {
           name: "Administrador",
-          email: "admin@fieldreport.com",
+          email: "admin@friodesk.com",
           passwordHash,
           role: "admin",
         },
         {
           name: "João Silva",
-          email: "joao.silva@fieldreport.com",
+          email: "joao.silva@friodesk.com",
           passwordHash,
           role: "technician",
         },
         {
           name: "Maria Santos",
-          email: "maria.santos@fieldreport.com",
+          email: "maria.santos@friodesk.com",
           passwordHash,
           role: "technician",
         },
         {
           name: "Pedro Oliveira",
-          email: "pedro.oliveira@fieldreport.com",
+          email: "pedro.oliveira@friodesk.com",
           passwordHash,
           role: "technician",
         },
@@ -219,7 +219,7 @@ async function seed() {
       return Array.from({ length: photoCount }, (_, photoIdx) => ({
         serviceId: service.id,
         url: `https://placehold.co/800x600/e2e8f0/1e293b?text=Foto+${photoIdx + 1}+Serviço`,
-        publicId: `field-report/service-${service.id}-photo-${photoIdx + 1}`,
+        publicId: `friodesk/service-${service.id}-photo-${photoIdx + 1}`,
       }));
     });
 
@@ -267,10 +267,10 @@ async function seed() {
     console.log(`   • Photos: ${photosData.length}`);
     console.log(`   • Reports: ${reportsData.length}`);
     console.log("\n🔑 Login credentials (all users):");
-    console.log("   • Email: admin@fieldreport.com (admin)");
-    console.log("   • Email: joao.silva@fieldreport.com (technician)");
-    console.log("   • Email: maria.santos@fieldreport.com (technician)");
-    console.log("   • Email: pedro.oliveira@fieldreport.com (technician)");
+    console.log("   • Email: admin@friodesk.com (admin)");
+    console.log("   • Email: joao.silva@friodesk.com (technician)");
+    console.log("   • Email: maria.santos@friodesk.com (technician)");
+    console.log("   • Email: pedro.oliveira@friodesk.com (technician)");
     console.log("   • Password: 123456");
   } catch (error) {
     console.error("❌ Seed failed:", error);

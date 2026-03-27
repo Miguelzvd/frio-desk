@@ -1,4 +1,4 @@
-import type { ServiceType, ServiceStatus } from "@field-report/shared"
+import type { ServiceType, ServiceStatus } from "@friodesk/shared"
 
 export const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
   preventiva: "Preventiva",

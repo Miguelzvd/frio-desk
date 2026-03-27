@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: fieldreport
+      POSTGRES_DB: friodesk
     ports:
       - "5432:5432"
     volumes:

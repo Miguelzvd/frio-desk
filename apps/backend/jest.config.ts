@@ -6,7 +6,7 @@ const config: Config = {
   roots: ["<rootDir>/tests"],
   testMatch: ["**/*.test.ts"],
   moduleNameMapper: {
-    "^@field-report/shared$":
+    "^@friodesk/shared$":
       "<rootDir>/../../packages/shared/src/index.ts",
   },
   transform: {
@@ -20,7 +20,7 @@ const config: Config = {
           types: ["node", "jest"],
           baseUrl: ".",
           paths: {
-            "@field-report/shared": ["../../packages/shared/src/index.ts"],
+            "@friodesk/shared": ["../../packages/shared/src/index.ts"],
           },
         },
       },

@@ -34,7 +34,7 @@ export async function uploadPhoto(
   const { url, publicId } = await storage.upload(
     fileBuffer,
     originalName,
-    `field-report/${serviceId}`
+    `friodesk/${serviceId}`
   )
 
   return photosRepository.createPhoto({ serviceId, url, publicId })

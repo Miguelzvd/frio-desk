@@ -1,4 +1,4 @@
-import { ServiceType, UserRole, PaginatedResponse } from "@field-report/shared";
+import { ServiceType, UserRole, PaginatedResponse } from "@friodesk/shared";
 import * as servicesRepository from "./services.repository";
 import {
   ServiceSelect,

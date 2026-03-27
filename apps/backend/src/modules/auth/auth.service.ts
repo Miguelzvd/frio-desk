@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import { UserPublic, UserRole } from "@field-report/shared"
+import { UserPublic, UserRole } from "@friodesk/shared"
 import { JwtPayload } from "../../middlewares/auth"
 import * as authRepository from "./auth.repository"
 

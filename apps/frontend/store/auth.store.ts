@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>()(
       isAdmin: () => get().user?.role === "admin",
     }),
     {
-      name: "field-report-auth",
+      name: "friodesk-auth",
       storage: createJSONStorage(() => localStorage),
     }
   )

@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { SERVICE_TYPE_LABELS } from "@/lib/constants";
 import { useCreateService } from "@/hooks/use-services";
-import type { ServiceType } from "@field-report/shared";
+import type { ServiceType } from "@friodesk/shared";
 
 const schema = z.object({
   type: z.enum(["preventiva", "corretiva", "instalação", "inspeção"] as const),
@@ -49,7 +49,7 @@ export function ServiceForm({ onSuccess }: ServiceFormProps) {
     formState: { errors },
   } = useForm<FormValues>({
     // @ts-expect-error @hookform/resolvers
-    resolver: zodResolver(schema) as Resolver<FormValues>,
+    resolver: zodResolver(schema),
   });
 
   const selectedType = watch("type");

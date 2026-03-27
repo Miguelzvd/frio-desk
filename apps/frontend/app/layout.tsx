@@ -22,7 +22,7 @@ const syne = Syne({
 })
 
 export const metadata: Metadata = {
-  title: "FieldReport — Gestão de Serviços de Ar-Condicionado",
+  title: "FrioDesk — Gestão de Serviços de Ar-Condicionado",
   description:
     "Do checklist em campo até o relatório final. Preventiva, corretiva, instalação e inspeção.",
 }

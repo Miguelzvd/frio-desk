@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { ChecklistItem } from "@field-report/shared"
+import type { ChecklistItem } from "@friodesk/shared"
 
 interface ChecklistProps {
   items: ChecklistItem[]

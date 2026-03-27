@@ -3,7 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  transpilePackages: ["@field-report/shared"],
+  transpilePackages: ["@friodesk/shared"],
   turbopack: {
     root: path.resolve(__dirname, "../.."),
   },

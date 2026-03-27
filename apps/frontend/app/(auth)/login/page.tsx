@@ -36,7 +36,7 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     // @ts-expect-error @hookform/resolvers
-    resolver: zodResolver(schema) as Resolver<FormValues>,
+    resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormValues) => {
@@ -60,7 +60,7 @@ export default function LoginPage() {
             <Wind className="size-6 text-primary-foreground" />
           </div>
           <div className="text-center">
-            <h1 className="font-heading text-2xl font-bold">FieldReport</h1>
+            <h1 className="font-heading text-2xl font-bold">FrioDesk</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Acesse sua conta de técnico
             </p>

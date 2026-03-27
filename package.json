@@ -1,18 +1,18 @@
 {
-  "name": "field-report",
+  "name": "friodesk",
   "version": "1.0.0",
   "private": true,
   "description": "Ferramenta digital para equipes de ar-condicionado. Do checklist em campo até o relatório final, em manutenção preventiva, corretiva, instalação ou inspeção.",
   "scripts": {
-    "build:shared": "pnpm --filter @field-report/shared build",
-    "dev:backend": "pnpm --filter @field-report/backend dev",
+    "build:shared": "pnpm --filter @friodesk/shared build",
+    "dev:backend": "pnpm --filter @friodesk/backend dev",
     "dev:frontend": "pnpm --filter frontend dev",
-    "build:backend": "pnpm --filter @field-report/backend build",
+    "build:backend": "pnpm --filter @friodesk/backend build",
     "build:frontend": "pnpm --filter frontend build",
-    "test:backend": "pnpm --filter @field-report/backend test",
-    "generate": "pnpm --filter @field-report/backend generate",
-    "migrate": "pnpm --filter @field-report/backend migrate",
-    "seed": "pnpm --filter @field-report/backend seed"
+    "test:backend": "pnpm --filter @friodesk/backend test",
+    "generate": "pnpm --filter @friodesk/backend generate",
+    "migrate": "pnpm --filter @friodesk/backend migrate",
+    "seed": "pnpm --filter @friodesk/backend seed"
   },
   "keywords": [],
   "author": "",

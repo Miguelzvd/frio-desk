@@ -1,7 +1,7 @@
 import { eq, count, lt, desc, and } from "drizzle-orm"
 import { db } from "../../db"
 import { users, services, UserSelect, ServiceSelect } from "../../db/schema"
-import type { PaginatedResponse } from "@field-report/shared"
+import type { PaginatedResponse } from "@friodesk/shared"
 
 export async function getAdminTechnicians() {
   const result = await db

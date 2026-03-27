@@ -1,5 +1,5 @@
 {
-  "name": "@field-report/shared",
+  "name": "@friodesk/shared",
   "version": "1.0.0",
   "description": "Tipos e interfaces TypeScript compartilhados entre os pacotes do monorepo",
   "main": "src/index.ts",
