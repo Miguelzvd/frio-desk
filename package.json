@@ -1,0 +1,16 @@
+{
+  "name": "field-report",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ferramenta digital para equipes de ar-condicionado. Do checklist em campo até o relatório final, em manutenção preventiva, corretiva, instalação ou inspeção.",
+  "scripts": {
+    "dev:backend": "pnpm --filter @field-report/backend dev",
+    "build:backend": "pnpm --filter @field-report/backend build",
+    "test:backend": "pnpm --filter @field-report/backend test",
+    "migrate": "pnpm --filter @field-report/backend migrate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.22.0"
+}
