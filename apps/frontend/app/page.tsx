@@ -1,22 +1,16 @@
-"use client"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuthStore } from "@/store/auth.store"
+export default async function RootPage() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("accessToken")?.value
+  const role = cookieStore.get("auth-role")?.value
 
-export default function RootPage() {
-  const router = useRouter()
-  const { accessToken, isAdmin } = useAuthStore()
-
-  useEffect(() => {
-    if (!accessToken) {
-      router.replace("/login")
-    } else if (isAdmin()) {
-      router.replace("/admin/dashboard")
-    } else {
-      router.replace("/dashboard")
-    }
-  }, [accessToken, isAdmin, router])
-
-  return null
+  if (!token) {
+    redirect("/login")
+  } else if (role === "admin") {
+    redirect("/admin/dashboard")
+  } else {
+    redirect("/dashboard")
+  }
 }
