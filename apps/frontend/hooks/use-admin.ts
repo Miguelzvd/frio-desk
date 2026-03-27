@@ -64,7 +64,7 @@ export function useAdminTechnicians() {
   const fetch = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await api.get<AdminTechnician[]>("technicians")
+      const res = await api.get<AdminTechnician[]>("users/technicians")
       setTechnicians(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
