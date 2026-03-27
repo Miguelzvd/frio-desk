@@ -44,7 +44,7 @@ export async function getUserServicesController(
       res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 })
       return
     }
-    const result = await servicesRepository.findUserServicesPaginated(
+    const result = await servicesRepository.findServicesByUserIdPaginated(
       req.params.id as string,
       parsed.data.cursor,
       parsed.data.limit,

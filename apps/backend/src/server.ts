@@ -2,6 +2,7 @@ import "dotenv/config";
 import path from "path";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import authRoutes from "./modules/auth/auth.routes";
 import servicesRoutes from "./modules/services/services.routes";
 import photosRoutes from "./modules/photos/photos.routes";
@@ -16,6 +17,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use(cookieParser());
 app.use(express.json());
 
 app.get("/health", (_req, res) => {

@@ -43,7 +43,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormValues) => {
     try {
       const res = await api.post<RegisterResponse>("/auth/register", data);
-      login(res.data.user, res.data.tokens.accessToken);
+      login(res.data.user);
       router.replace("/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {

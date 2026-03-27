@@ -20,14 +20,19 @@ export function authMiddleware(
   res: Response,
   next: NextFunction
 ): void {
-  const authHeader = req.headers.authorization
+  let token = req.cookies?.accessToken;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Token não fornecido", statusCode: 401 })
-    return
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
   }
 
-  const token = authHeader.split(" ")[1]
+  if (!token) {
+    res.status(401).json({ error: "Token não fornecido", statusCode: 401 });
+    return;
+  }
 
   try {
     const secret = process.env.JWT_SECRET

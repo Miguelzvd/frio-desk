@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
         );
         return;
       }
-      login(res.data.user, res.data.tokens.accessToken);
+      login(res.data.user);
       router.replace("/admin/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {

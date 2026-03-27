@@ -1,6 +1,25 @@
 import { Request, Response } from "express";
 import * as authService from "./auth.service";
+import * as usersService from "../users/users.service";
 import { loginSchema, refreshSchema, registerSchema } from "./auth.schema";
+
+
+function clearToken(res: Response, tokenName: string) {
+  res.clearCookie(tokenName, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+}
+
+function setToken(res: Response, tokenName: string, token: string) {
+  res.cookie(tokenName, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+}
 
 export async function register(req: Request, res: Response): Promise<void> {
   try {
@@ -15,7 +34,14 @@ export async function register(req: Request, res: Response): Promise<void> {
 
     const { name, email, password } = parsed.data;
     const result = await authService.register(name, email, password);
-    res.status(201).json(result);
+    
+    setToken(res, "accessToken", result.tokens.accessToken);
+
+    if (result.tokens.refreshToken) {
+      setToken(res, "refreshToken", result.tokens.refreshToken);
+    }
+
+    res.status(201).json({ user: result.user });
   } catch (err) {
     const error = err as Error & { statusCode?: number };
     const statusCode = error.statusCode ?? 500;
@@ -36,7 +62,15 @@ export async function login(req: Request, res: Response): Promise<void> {
 
     const { email, password } = parsed.data;
     const result = await authService.login(email, password);
-    res.status(200).json(result);
+
+
+    setToken(res, "accessToken", result.tokens.accessToken);
+
+    if (result.tokens.refreshToken) {
+      setToken(res, "refreshToken", result.tokens.refreshToken);
+    }
+
+    res.status(200).json({ user: result.user });
   } catch (err) {
     const error = err as Error & { statusCode?: number };
     const statusCode = error.statusCode ?? 500;
@@ -55,12 +89,43 @@ export async function refresh(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { refreshToken } = parsed.data;
+    const refreshToken = parsed.data.refreshToken || req.cookies?.refreshToken;
+    
+    if (!refreshToken) {
+       res.status(401).json({ error: "Refresh token não fornecido", statusCode: 401 });
+       return;
+    }
+
     const tokens = await authService.refresh(refreshToken);
-    res.status(200).json(tokens);
+    
+    setToken(res, "accessToken", tokens.accessToken);
+    setToken(res, "refreshToken", tokens.refreshToken);
+
+    res.status(200).json({ success: true });
   } catch (err) {
     const error = err as Error & { statusCode?: number };
     const statusCode = error.statusCode ?? 500;
     res.status(statusCode).json({ error: error.message, statusCode });
+  }
+}
+
+export async function logout(req: Request, res: Response): Promise<void> {
+  clearToken(res, "accessToken");
+  clearToken(res, "refreshToken");
+  
+  res.status(200).json({ success: true });
+}
+
+export async function me(req: Request, res: Response): Promise<void> {
+  if (!req.user) {
+    res.status(401).json({ error: "Não autorizado", statusCode: 401 });
+    return;
+  }
+  
+  try {
+    const user = await usersService.getUserById(req.user.userId);
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(401).json({ error: "Usuário não encontrado", statusCode: 401 });
   }
 }

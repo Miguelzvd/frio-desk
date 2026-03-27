@@ -38,7 +38,7 @@ export default function LoginPage() {
   const onSubmit = async (data: FormValues) => {
     try {
       const res = await api.post<LoginResponse>("/auth/login", data);
-      login(res.data.user, res.data.tokens.accessToken);
+      login(res.data.user);
       router.replace("/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
