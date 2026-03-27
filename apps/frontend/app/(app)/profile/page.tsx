@@ -1,23 +1,36 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { LogOut, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { useAuthStore } from "@/store/auth.store"
+import { useRouter } from "next/navigation";
+import { ArrowLeft, LogOut, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useAuthStore } from "@/store/auth.store";
+import Link from "next/link";
 
 export default function ProfilePage() {
-  const router = useRouter()
-  const { user, logout } = useAuthStore()
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
-    logout()
-    router.replace("/login")
-  }
+    logout();
+    router.replace("/login");
+  };
 
   return (
-    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8">
-      <h2 className="font-heading text-xl font-bold">Perfil</h2>
+    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8 px-4">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-9"
+          nativeButton={false}
+          render={<Link href="/dashboard" />}
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+
+        <h2 className="font-heading text-xl font-bold leading-none">Perfil </h2>
+      </div>
 
       <Card>
         <CardContent className="pt-5">
@@ -26,7 +39,9 @@ export default function ProfilePage() {
               <User className="size-7 text-primary" />
             </div>
             <div className="min-w-0">
-              <p className="font-heading font-semibold truncate">{user?.name}</p>
+              <p className="font-heading font-semibold truncate">
+                {user?.name}
+              </p>
               <p className="mt-0.5 text-sm text-muted-foreground truncate">
                 {user?.email}
               </p>
@@ -47,5 +62,5 @@ export default function ProfilePage() {
         Sair da conta
       </Button>
     </div>
-  )
+  );
 }

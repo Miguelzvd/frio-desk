@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { services, loading } = useServices();
 
   return (
-    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8">
+    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8 px-4">
       <div className="space-y-1 px-4 py-5">
         <h2 className="font-heading text-xl font-bold">Meus Serviços</h2>
         <p className="text-sm text-muted-foreground">
@@ -20,10 +20,10 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="px-4 ">
+      <div className="">
         {loading ? (
-          <div className="space-y-3 ">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
               <Skeleton key={i} className="h-18 w-full rounded-xl" />
             ))}
           </div>
@@ -47,24 +47,24 @@ export default function DashboardPage() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {services.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>
         )}
-      </div>
 
-      {/* FAB */}
-      {services.length > 0 && (
-        <Link
-          href="/services/new"
-          className="fixed bottom-20 right-4 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
-          aria-label="Novo serviço"
-        >
-          <Plus className="size-6" />
-        </Link>
-      )}
+        {/* FAB */}
+        {services.length > 0 && (
+          <Link
+            href="/services/new"
+            className="fixed bottom-20 right-4 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
+            aria-label="Novo serviço"
+          >
+            <Plus className="size-6" />
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

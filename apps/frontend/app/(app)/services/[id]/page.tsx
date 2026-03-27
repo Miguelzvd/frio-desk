@@ -50,7 +50,7 @@ export default function ServiceDetailPage({ params }: Props) {
   const isFinished = service.status === "finished";
 
   return (
-    <div className="space-y-5 px-4 py-5">
+    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8 px-4">
       {/* Back + Title */}
       <div className="flex items-start gap-3">
         <Button
