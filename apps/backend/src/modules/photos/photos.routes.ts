@@ -21,5 +21,6 @@ router.use(authMiddleware)
 
 router.get("/", photosController.getPhotos)
 router.post("/", upload.single("photo"), photosController.uploadPhoto)
+router.delete("/:photoId", photosController.deletePhoto)
 
 export default router

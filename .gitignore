@@ -49,6 +49,8 @@ apps/*/.next/
 apps/*/out/
 /out/
 
+apps/*/uploads/
+
 # production
 /build
 

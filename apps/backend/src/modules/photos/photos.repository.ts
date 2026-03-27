@@ -23,3 +23,7 @@ export async function findPhotoById(
     .limit(1)
   return result[0]
 }
+
+export async function deletePhoto(id: string): Promise<void> {
+  await db.delete(photos).where(eq(photos.id, id))
+}
