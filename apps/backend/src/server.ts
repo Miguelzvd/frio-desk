@@ -16,7 +16,6 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-// Serve arquivos locais quando STORAGE_PROVIDER=local (padrão)
 if (!process.env.STORAGE_PROVIDER || process.env.STORAGE_PROVIDER === "local") {
   app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 }
