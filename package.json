@@ -4,12 +4,14 @@
   "private": true,
   "description": "Ferramenta digital para equipes de ar-condicionado. Do checklist em campo até o relatório final, em manutenção preventiva, corretiva, instalação ou inspeção.",
   "scripts": {
+    "build:shared": "pnpm --filter @field-report/shared build",
     "dev:backend": "pnpm --filter @field-report/backend dev",
     "dev:frontend": "pnpm --filter frontend dev",
     "build:backend": "pnpm --filter @field-report/backend build",
     "build:frontend": "pnpm --filter frontend build",
     "test:backend": "pnpm --filter @field-report/backend test",
-    "migrate": "pnpm --filter @field-report/backend migrate"
+    "migrate": "pnpm --filter @field-report/backend migrate",
+    "seed": "pnpm --filter @field-report/backend seed"
   },
   "keywords": [],
   "author": "",
