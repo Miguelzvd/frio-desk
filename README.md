@@ -227,27 +227,34 @@ pnpm test:backend
 
 ### Services (requer JWT)
 
-| Método | Rota            | Descrição                            |
-| ------ | --------------- | ------------------------------------ |
-| POST   | `/services`     | Criar serviço + checklist automático |
-| GET    | `/services`     | Listar serviços do usuário           |
-| GET    | `/services/:id` | Detalhe com checklist e fotos        |
-| PATCH  | `/services/:id` | Atualizar serviço                    |
-| DELETE | `/services/:id` | Remover serviço                      |
+| Método | Rota                                        | Descrição                                           |
+| ------ | ------------------------------------------- | --------------------------------------------------- |
+| POST   | `/services`                                 | Criar serviço + checklist automático                |
+| GET    | `/services`                                 | Listar serviços (paginado, filtrável por tipo/status) |
+| GET    | `/services/metrics`                         | Métricas de serviços do usuário                     |
+| GET    | `/services/:id`                             | Detalhe com checklist e fotos                       |
+| PATCH  | `/services/:id`                             | Atualizar serviço                                   |
+| DELETE | `/services/:id`                             | Remover serviço                                     |
+| PATCH  | `/services/:serviceId/checklist/:itemId`    | Marcar/desmarcar item do checklist                  |
 
 ### Photos (requer JWT)
 
-| Método | Rota                       | Descrição                            |
-| ------ | -------------------------- | ------------------------------------ |
-| POST   | `/services/:id/photos`     | Upload de foto (multipart/form-data) |
-| DELETE | `/services/:id/photos/:id` | Remover foto                         |
+| Método | Rota                             | Descrição                            |
+| ------ | -------------------------------- | ------------------------------------ |
+| GET    | `/services/:id/photos`           | Listar fotos do serviço              |
+| POST   | `/services/:id/photos`           | Upload de foto (multipart/form-data) |
+| DELETE | `/services/:id/photos/:photoId`  | Remover foto                         |
 
-### Reports (requer JWT)
+### Users (requer JWT)
 
-| Método | Rota                   | Descrição          |
-| ------ | ---------------------- | ------------------ |
-| POST   | `/services/:id/report` | Criar relatório    |
-| GET    | `/services/:id/report` | Relatório completo |
+| Método | Rota                    | Descrição                          | Role  |
+| ------ | ----------------------- | ---------------------------------- | ----- |
+| GET    | `/users/technicians`    | Listar técnicos cadastrados        | —     |
+| GET    | `/users`                | Listar todos os usuários           | Admin |
+| GET    | `/users/:id`            | Detalhe de um usuário              | Admin |
+| GET    | `/users/:id/services`   | Serviços de um usuário             | Admin |
+| PATCH  | `/users/:id`            | Atualizar usuário                  | Admin |
+| DELETE | `/users/:id`            | Remover usuário                    | Admin |
 
 ---
 
