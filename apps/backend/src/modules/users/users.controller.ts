@@ -1,12 +1,19 @@
 import { Request, Response } from "express"
-import { getAdminTechnicians } from "./users.repository"
+import { getAdminTechniciansPaginated } from "./users.repository"
 import * as usersService from "./users.service"
+import * as servicesRepository from "../services/services.repository"
 import { updateUserSchema } from "./users.schema"
+import { paginationQuerySchema } from "../../shared/pagination.schema"
 
-export async function listUsersController(_req: Request, res: Response): Promise<void> {
+export async function listUsersController(req: Request, res: Response): Promise<void> {
   try {
-    const technicians = await getAdminTechnicians()
-    res.json(technicians)
+    const parsed = paginationQuerySchema.safeParse(req.query)
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 })
+      return
+    }
+    const result = await getAdminTechniciansPaginated(parsed.data.cursor, parsed.data.limit)
+    res.json(result)
   } catch (err) {
     const error = err as Error & { statusCode?: number }
     res
@@ -32,8 +39,17 @@ export async function getUserServicesController(
   res: Response,
 ): Promise<void> {
   try {
-    const services = await usersService.getUserServices(req.params.id as string)
-    res.json(services)
+    const parsed = paginationQuerySchema.safeParse(req.query)
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 })
+      return
+    }
+    const result = await servicesRepository.findUserServicesPaginated(
+      req.params.id as string,
+      parsed.data.cursor,
+      parsed.data.limit,
+    )
+    res.json(result)
   } catch (err) {
     const error = err as Error & { statusCode?: number }
     res

@@ -1,4 +1,4 @@
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, lt, desc } from "drizzle-orm";
 import { db } from "../../db";
 import {
   services,
@@ -11,6 +11,7 @@ import {
   PhotoSelect,
   users,
 } from "../../db/schema";
+import type { PaginatedResponse } from "@field-report/shared";
 
 export interface ServiceWithUser extends ServiceSelect {
   user: { id: string; name: string; email: string }
@@ -119,6 +120,129 @@ export async function findServiceByIdForAdmin(
     .where(eq(services.id, id))
     .limit(1)
   return result[0]
+}
+
+export async function findServicesByUserIdPaginated(
+  userId: string,
+  cursor: string | undefined,
+  limit: number,
+): Promise<PaginatedResponse<ServiceSelect>> {
+  const [totalRes] = await db
+    .select({ value: count() })
+    .from(services)
+    .where(eq(services.userId, userId));
+  const total = totalRes?.value ?? 0;
+
+  let cursorCreatedAt: Date | undefined;
+  if (cursor) {
+    const [cursorItem] = await db
+      .select({ createdAt: services.createdAt })
+      .from(services)
+      .where(eq(services.id, cursor))
+      .limit(1);
+    cursorCreatedAt = cursorItem?.createdAt;
+  }
+
+  const rows = await db
+    .select()
+    .from(services)
+    .where(
+      cursorCreatedAt
+        ? and(eq(services.userId, userId), lt(services.createdAt, cursorCreatedAt))
+        : eq(services.userId, userId),
+    )
+    .orderBy(desc(services.createdAt))
+    .limit(limit + 1);
+
+  const hasNext = rows.length > limit;
+  const data = hasNext ? rows.slice(0, limit) : rows;
+  const nextCursor = hasNext ? data[data.length - 1].id : null;
+
+  return { data, nextCursor, total };
+}
+
+export async function findAllServicesWithUserPaginated(
+  cursor: string | undefined,
+  limit: number,
+): Promise<PaginatedResponse<ServiceWithUser>> {
+  const [totalRes] = await db.select({ value: count() }).from(services);
+  const total = totalRes?.value ?? 0;
+
+  let cursorCreatedAt: Date | undefined;
+  if (cursor) {
+    const [cursorItem] = await db
+      .select({ createdAt: services.createdAt })
+      .from(services)
+      .where(eq(services.id, cursor))
+      .limit(1);
+    cursorCreatedAt = cursorItem?.createdAt;
+  }
+
+  const rows = await db
+    .select({
+      id: services.id,
+      userId: services.userId,
+      type: services.type,
+      status: services.status,
+      notes: services.notes,
+      createdAt: services.createdAt,
+      finishedAt: services.finishedAt,
+      user: {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      },
+    })
+    .from(services)
+    .innerJoin(users, eq(services.userId, users.id))
+    .where(cursorCreatedAt ? lt(services.createdAt, cursorCreatedAt) : undefined)
+    .orderBy(desc(services.createdAt))
+    .limit(limit + 1);
+
+  const hasNext = rows.length > limit;
+  const data = hasNext ? rows.slice(0, limit) : rows;
+  const nextCursor = hasNext ? data[data.length - 1].id : null;
+
+  return { data, nextCursor, total };
+}
+
+export async function findUserServicesPaginated(
+  userId: string,
+  cursor: string | undefined,
+  limit: number,
+): Promise<PaginatedResponse<ServiceSelect>> {
+  const [totalRes] = await db
+    .select({ value: count() })
+    .from(services)
+    .where(eq(services.userId, userId));
+  const total = totalRes?.value ?? 0;
+
+  let cursorCreatedAt: Date | undefined;
+  if (cursor) {
+    const [cursorItem] = await db
+      .select({ createdAt: services.createdAt })
+      .from(services)
+      .where(eq(services.id, cursor))
+      .limit(1);
+    cursorCreatedAt = cursorItem?.createdAt;
+  }
+
+  const rows = await db
+    .select()
+    .from(services)
+    .where(
+      cursorCreatedAt
+        ? and(eq(services.userId, userId), lt(services.createdAt, cursorCreatedAt))
+        : eq(services.userId, userId),
+    )
+    .orderBy(desc(services.createdAt))
+    .limit(limit + 1);
+
+  const hasNext = rows.length > limit;
+  const data = hasNext ? rows.slice(0, limit) : rows;
+  const nextCursor = hasNext ? data[data.length - 1].id : null;
+
+  return { data, nextCursor, total };
 }
 
 export async function updateChecklistItem(

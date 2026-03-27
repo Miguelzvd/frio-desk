@@ -1,4 +1,4 @@
-import { ServiceType, UserRole } from "@field-report/shared";
+import { ServiceType, UserRole, PaginatedResponse } from "@field-report/shared";
 import * as servicesRepository from "./services.repository";
 import {
   ServiceSelect,
@@ -6,6 +6,11 @@ import {
   PhotoSelect,
 } from "../../db/schema";
 import { ServiceWithUser } from "./services.repository";
+
+export interface PaginationParams {
+  cursor?: string;
+  limit?: number;
+}
 
 const DEFAULT_CHECKLISTS: Record<ServiceType, string[]> = {
   preventiva: [
@@ -54,11 +59,13 @@ export async function createService(
 export async function listServices(
   userId: string,
   role: UserRole,
-): Promise<ServiceSelect[] | ServiceWithUser[]> {
+  pagination: PaginationParams,
+): Promise<PaginatedResponse<ServiceSelect | ServiceWithUser>> {
+  const limit = pagination.limit ?? 8;
   if (role === "admin") {
-    return servicesRepository.findAllServicesWithUser();
+    return servicesRepository.findAllServicesWithUserPaginated(pagination.cursor, limit);
   }
-  return servicesRepository.findServicesByUserId(userId);
+  return servicesRepository.findServicesByUserIdPaginated(userId, pagination.cursor, limit);
 }
 
 export async function getServiceDetail(

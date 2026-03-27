@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createServiceSchema, updateServiceSchema } from "./services.schema";
+import { createServiceSchema, updateServiceSchema, paginationQuerySchema } from "./services.schema";
 import * as servicesService from "./services.service";
 import * as servicesRepository from "./services.repository";
 
@@ -32,9 +32,15 @@ export async function createService(
 
 export async function listServices(req: Request, res: Response): Promise<void> {
   try {
+    const parsed = paginationQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 });
+      return;
+    }
     const services = await servicesService.listServices(
       req.user!.userId,
       req.user!.role,
+      { cursor: parsed.data.cursor, limit: parsed.data.limit },
     );
     res.status(200).json(services);
   } catch (err) {

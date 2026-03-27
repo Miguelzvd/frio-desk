@@ -27,16 +27,13 @@ export default function NewServicePage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold">
-            Tipo de serviço
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ServiceForm />
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center">
+        <Card className="max-w-xl w-full">
+          <CardContent>
+            <ServiceForm />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

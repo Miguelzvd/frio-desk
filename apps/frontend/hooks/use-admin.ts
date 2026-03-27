@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import axios from "axios"
 import api from "@/lib/api"
-import type { ServiceType, ChecklistItem, Photo } from "@field-report/shared"
+import { buildCursorQuery } from "@/lib/pagination"
+import type { ServiceType, ChecklistItem, Photo, PaginatedResponse } from "@field-report/shared"
 import type { ApiService } from "@/hooks/use-services"
 
 export interface AdminService extends ApiService {
@@ -37,29 +39,15 @@ export interface AdminMetrics {
   byType: Record<ServiceType, number>
 }
 
-export function useAdminServices() {
-  const [services, setServices] = useState<AdminService[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetch = useCallback(async () => {
-    try {
-      setLoading(true)
-      const res = await api.get<AdminService[]>("/services")
-      setServices(res.data)
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao carregar serviços")
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void fetch()
-  }, [fetch])
-
-  return { services, loading, refetch: fetch }
+export function useAdminServices(cursor?: string) {
+  return useQuery({
+    queryKey: ["admin", "services", cursor],
+    queryFn: async () => {
+      const qs = buildCursorQuery(cursor)
+      const res = await api.get<PaginatedResponse<AdminService>>(`/services${qs}`)
+      return res.data
+    },
+  })
 }
 
 export function useAdminServiceDetail(id: string) {
@@ -87,29 +75,15 @@ export function useAdminServiceDetail(id: string) {
   return { service, loading, refetch: fetch }
 }
 
-export function useAdminTechnicians() {
-  const [technicians, setTechnicians] = useState<AdminTechnician[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetch = useCallback(async () => {
-    try {
-      setLoading(true)
-      const res = await api.get<AdminTechnician[]>("/users")
-      setTechnicians(res.data)
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao carregar técnicos")
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void fetch()
-  }, [fetch])
-
-  return { technicians, loading, refetch: fetch }
+export function useAdminTechnicians(cursor?: string) {
+  return useQuery({
+    queryKey: ["admin", "technicians", cursor],
+    queryFn: async () => {
+      const qs = buildCursorQuery(cursor)
+      const res = await api.get<PaginatedResponse<AdminTechnician>>(`/users${qs}`)
+      return res.data
+    },
+  })
 }
 
 export function useAdminMetrics() {

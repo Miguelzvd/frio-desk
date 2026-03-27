@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useInfiniteQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import axios from "axios"
 import api from "@/lib/api"
-import type { ServiceType, ChecklistItem } from "@field-report/shared"
+import { buildCursorQuery } from "@/lib/pagination"
+import type { ServiceType, ChecklistItem, PaginatedResponse } from "@field-report/shared"
 
 export interface ApiService {
   id: string
@@ -18,28 +20,16 @@ export interface ApiService {
 }
 
 export function useServices() {
-  const [services, setServices] = useState<ApiService[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetch = useCallback(async () => {
-    try {
-      setLoading(true)
-      const res = await api.get<ApiService[]>("/services")
-      setServices(res.data)
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao carregar serviços")
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void fetch()
-  }, [fetch])
-
-  return { services, loading, refetch: fetch }
+  return useInfiniteQuery({
+    queryKey: ["services"],
+    queryFn: async ({ pageParam }) => {
+      const qs = buildCursorQuery(pageParam as string | undefined)
+      const res = await api.get<PaginatedResponse<ApiService>>(`/services${qs}`)
+      return res.data
+    },
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  })
 }
 
 export function useServiceDetail(id: string) {
