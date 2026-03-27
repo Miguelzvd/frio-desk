@@ -16,16 +16,17 @@ const config: Config = {
         tsconfig: {
           strict: true,
           esModuleInterop: true,
+          preserveSymlinks: true,
+          types: ["node", "jest"],
           baseUrl: ".",
           paths: {
-            "@field-report/shared": [
-              "../../packages/shared/src/index.ts",
-            ],
+            "@field-report/shared": ["../../packages/shared/src/index.ts"],
           },
         },
       },
     ],
   },
+  setupFiles: ["<rootDir>/jest.setup.ts"],
   clearMocks: true,
   collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts"],
 }
