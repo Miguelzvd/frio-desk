@@ -39,7 +39,7 @@ export function useAdminServices() {
   const fetch = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await api.get<AdminService[]>("/admin/services")
+      const res = await api.get<AdminService[]>("services")
       setServices(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -64,7 +64,7 @@ export function useAdminTechnicians() {
   const fetch = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await api.get<AdminTechnician[]>("/admin/technicians")
+      const res = await api.get<AdminTechnician[]>("technicians")
       setTechnicians(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {

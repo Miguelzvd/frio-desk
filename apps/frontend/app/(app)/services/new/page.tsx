@@ -6,7 +6,7 @@ import { ServiceForm } from "@/components/services/service-form";
 
 export default function NewServicePage() {
   return (
-    <div className="px-4 py-5 space-y-5">
+    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"

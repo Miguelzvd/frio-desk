@@ -16,7 +16,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-5 px-4 py-5">
+    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8">
       <h2 className="font-heading text-xl font-bold">Perfil</h2>
 
       <Card>
