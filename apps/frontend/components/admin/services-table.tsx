@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -27,6 +26,10 @@ import { cn } from "@/lib/utils";
 
 interface ServicesTableProps {
   services: AdminService[];
+  typeFilter: ServiceType | "all";
+  statusFilter: ServiceStatus | "all";
+  onTypeChange: (val: ServiceType | "all") => void;
+  onStatusChange: (val: ServiceStatus | "all") => void;
 }
 
 function formatDate(iso: string) {
@@ -41,32 +44,29 @@ const SERVICE_TYPES: ServiceType[] = [
 ];
 const SERVICE_STATUSES: ServiceStatus[] = ["open", "finished"];
 
-export function ServicesTable({ services }: ServicesTableProps) {
-  const [typeFilter, setTypeFilter] = useState<ServiceType | "all">("all");
-  const [statusFilter, setStatusFilter] = useState<ServiceStatus | "all">(
-    "all",
-  );
-
-  const filtered = services.filter((s) => {
-    if (typeFilter !== "all" && s.type !== typeFilter) return false;
-    if (statusFilter !== "all" && s.status !== statusFilter) return false;
-    return true;
-  });
-
+export function ServicesTable({ 
+  services,
+  typeFilter,
+  statusFilter,
+  onTypeChange,
+  onStatusChange
+}: ServicesTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
         <Select
           value={typeFilter}
-          onValueChange={(v) => setTypeFilter(v as ServiceType | "all")}
+          onValueChange={(v) => onTypeChange(v as ServiceType | "all")}
         >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Tipo" />
+          <SelectTrigger className="w-40 capitalize">
+            <SelectValue placeholder="Tipo">
+              {typeFilter === "all" ? "Todos" : SERVICE_TYPE_LABELS[typeFilter as ServiceType]}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os tipos</SelectItem>
+            <SelectItem value="all" className="capitalize">Todos</SelectItem>
             {SERVICE_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>
+              <SelectItem key={t} value={t} className="capitalize">
                 {SERVICE_TYPE_LABELS[t]}
               </SelectItem>
             ))}
@@ -75,15 +75,17 @@ export function ServicesTable({ services }: ServicesTableProps) {
 
         <Select
           value={statusFilter}
-          onValueChange={(v) => setStatusFilter(v as ServiceStatus | "all")}
+          onValueChange={(v) => onStatusChange(v as ServiceStatus | "all")}
         >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Status" />
+          <SelectTrigger className="w-40 capitalize">
+            <SelectValue placeholder="Status">
+              {statusFilter === "all" ? "Todos" : SERVICE_STATUS_LABELS[statusFilter as ServiceStatus]}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="all" className="capitalize">Todos</SelectItem>
             {SERVICE_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
+              <SelectItem key={s} value={s} className="capitalize">
                 {SERVICE_STATUS_LABELS[s]}
               </SelectItem>
             ))}
@@ -103,7 +105,7 @@ export function ServicesTable({ services }: ServicesTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {services.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -113,18 +115,18 @@ export function ServicesTable({ services }: ServicesTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((service) => (
+              services.map((service) => (
                 <TableRow key={service.id}>
-                  <TableCell className="font-medium text-sm">
+                  <TableCell className="font-medium text-sm capitalize">
                     {service.user?.name ?? "—"}
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="text-sm capitalize">
                     {SERVICE_TYPE_LABELS[service.type]}
                   </TableCell>
                   <TableCell>
                     <Badge
                       className={cn(
-                        "text-[10px]",
+                        "text-[10px] capitalize",
                         service.status === "finished"
                           ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                           : "bg-amber-500/15 text-amber-700 dark:text-amber-400",

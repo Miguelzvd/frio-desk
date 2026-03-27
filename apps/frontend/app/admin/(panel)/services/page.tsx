@@ -6,13 +6,19 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { ServicesTable } from "@/components/admin/services-table"
 import { useAdminServices } from "@/hooks/use-admin"
+import type { ServiceType, ServiceStatus } from "@friodesk/shared"
 
 const PAGE_SIZE = 8
 
 export default function AdminServicesPage() {
   const [cursorStack, setCursorStack] = useState<string[]>([])
+  const [typeFilter, setTypeFilter] = useState<ServiceType | "all">("all")
+  const [statusFilter, setStatusFilter] = useState<ServiceStatus | "all">("all")
+  
   const currentCursor = cursorStack[cursorStack.length - 1]
-  const { data, isLoading } = useAdminServices(currentCursor)
+  
+  // Passamos os filtros para a API!
+  const { data, isLoading } = useAdminServices(currentCursor, typeFilter, statusFilter)
 
   const services = data?.data ?? []
   const total = data?.total ?? 0
@@ -27,6 +33,17 @@ export default function AdminServicesPage() {
 
   function handlePrev() {
     setCursorStack((prev) => prev.slice(0, -1))
+  }
+
+  // Se o usuário mudar o filtro, voltamos para a primeira página
+  function handleTypeChange(val: ServiceType | "all") {
+    setTypeFilter(val)
+    setCursorStack([]) 
+  }
+
+  function handleStatusChange(val: ServiceStatus | "all") {
+    setStatusFilter(val)
+    setCursorStack([])
   }
 
   return (
@@ -44,31 +61,26 @@ export default function AdminServicesPage() {
           ))}
         </div>
       ) : (
-        <ServicesTable services={services} />
+        <ServicesTable 
+          services={services} 
+          typeFilter={typeFilter}
+          statusFilter={statusFilter}
+          onTypeChange={handleTypeChange}
+          onStatusChange={handleStatusChange}
+        />
       )}
 
+      {/* Paginação continua igual */}
       <div className="flex items-center justify-between pt-2">
         <p className="text-sm text-muted-foreground">
           Página {currentPage} de {totalPages}
         </p>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrev}
-            disabled={cursorStack.length === 0 || isLoading}
-          >
-            <ChevronLeft className="size-4" />
-            Anterior
+          <Button variant="outline" size="sm" onClick={handlePrev} disabled={cursorStack.length === 0 || isLoading}>
+            <ChevronLeft className="size-4" /> Anterior
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNext}
-            disabled={!data?.nextCursor || isLoading}
-          >
-            Próxima
-            <ChevronRight className="size-4" />
+          <Button variant="outline" size="sm" onClick={handleNext} disabled={!data?.nextCursor || isLoading}>
+            Próxima <ChevronRight className="size-4" />
           </Button>
         </div>
       </div>

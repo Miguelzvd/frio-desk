@@ -60,14 +60,28 @@ export async function listServices(
   userId: string,
   role: UserRole,
   pagination: PaginationParams,
+  typeFilter?: string,
+  statusFilter?: string,
 ): Promise<PaginatedResponse<ServiceSelect | ServiceWithUser>> {
   const limit = pagination.limit ?? 8;
-  if (role === "admin") {
-    return servicesRepository.findAllServicesWithUserPaginated(pagination.cursor, limit);
-  }
-  return servicesRepository.findServicesByUserIdPaginated(userId, pagination.cursor, limit);
-}
 
+  if (role === "admin") {
+    return servicesRepository.findAllServicesWithUserPaginated(
+      pagination.cursor,
+      limit,
+      typeFilter,
+      statusFilter,
+    );
+  }
+
+  return servicesRepository.findServicesByUserIdPaginated(
+    userId,
+    pagination.cursor,
+    limit,
+    typeFilter,
+    statusFilter,
+  );
+}
 export async function getServiceDetail(
   id: string,
   userId: string,

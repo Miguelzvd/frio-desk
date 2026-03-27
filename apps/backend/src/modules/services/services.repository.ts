@@ -1,4 +1,4 @@
-import { eq, and, count, lt, desc } from "drizzle-orm";
+import { eq, and, count, lt, desc, SQL } from "drizzle-orm"; // <-- SQL adicionado aqui
 import { db } from "../../db";
 import {
   services,
@@ -14,7 +14,7 @@ import {
 import type { PaginatedResponse } from "@friodesk/shared";
 
 export interface ServiceWithUser extends ServiceSelect {
-  user: { id: string; name: string; email: string }
+  user: { id: string; name: string; email: string };
 }
 
 export async function findServicesByUserId(
@@ -89,6 +89,7 @@ export async function findPhotosByServiceId(
 ): Promise<PhotoSelect[]> {
   return db.select().from(photos).where(eq(photos.serviceId, serviceId));
 }
+
 export async function findAllServicesWithUser(): Promise<ServiceWithUser[]> {
   const result = await db
     .select({
@@ -107,8 +108,8 @@ export async function findAllServicesWithUser(): Promise<ServiceWithUser[]> {
     })
     .from(services)
     .innerJoin(users, eq(services.userId, users.id))
-    .orderBy(services.createdAt)
-  return result
+    .orderBy(services.createdAt);
+  return result;
 }
 
 export async function findServiceByIdForAdmin(
@@ -118,19 +119,31 @@ export async function findServiceByIdForAdmin(
     .select()
     .from(services)
     .where(eq(services.id, id))
-    .limit(1)
-  return result[0]
+    .limit(1);
+  return result[0];
 }
 
 export async function findServicesByUserIdPaginated(
   userId: string,
   cursor: string | undefined,
   limit: number,
+  typeFilter?: string,
+  statusFilter?: string,
 ): Promise<PaginatedResponse<ServiceSelect>> {
+  const filters: (SQL<unknown> | undefined)[] = [eq(services.userId, userId)];
+
+  if (typeFilter && typeFilter !== "all") {
+    filters.push(eq(services.type, typeFilter as any));
+  }
+  if (statusFilter && statusFilter !== "all") {
+    filters.push(eq(services.status, statusFilter as any));
+  }
+
+  const totalWhere = and(...filters);
   const [totalRes] = await db
     .select({ value: count() })
     .from(services)
-    .where(eq(services.userId, userId));
+    .where(totalWhere);
   const total = totalRes?.value ?? 0;
 
   let cursorCreatedAt: Date | undefined;
@@ -143,14 +156,15 @@ export async function findServicesByUserIdPaginated(
     cursorCreatedAt = cursorItem?.createdAt;
   }
 
+  const queryFilters = [...filters];
+  if (cursorCreatedAt) {
+    queryFilters.push(lt(services.createdAt, cursorCreatedAt));
+  }
+
   const rows = await db
     .select()
     .from(services)
-    .where(
-      cursorCreatedAt
-        ? and(eq(services.userId, userId), lt(services.createdAt, cursorCreatedAt))
-        : eq(services.userId, userId),
-    )
+    .where(and(...queryFilters))
     .orderBy(desc(services.createdAt))
     .limit(limit + 1);
 
@@ -164,8 +178,23 @@ export async function findServicesByUserIdPaginated(
 export async function findAllServicesWithUserPaginated(
   cursor: string | undefined,
   limit: number,
+  typeFilter?: string,
+  statusFilter?: string,
 ): Promise<PaginatedResponse<ServiceWithUser>> {
-  const [totalRes] = await db.select({ value: count() }).from(services);
+  const filters: (SQL<unknown> | undefined)[] = [];
+
+  if (typeFilter && typeFilter !== "all") {
+    filters.push(eq(services.type, typeFilter as any));
+  }
+  if (statusFilter && statusFilter !== "all") {
+    filters.push(eq(services.status, statusFilter as any));
+  }
+
+  const totalWhere = filters.length > 0 ? and(...filters) : undefined;
+  const [totalRes] = await db
+    .select({ value: count() })
+    .from(services)
+    .where(totalWhere);
   const total = totalRes?.value ?? 0;
 
   let cursorCreatedAt: Date | undefined;
@@ -177,6 +206,13 @@ export async function findAllServicesWithUserPaginated(
       .limit(1);
     cursorCreatedAt = cursorItem?.createdAt;
   }
+
+  const queryFilters = [...filters];
+  if (cursorCreatedAt) {
+    queryFilters.push(lt(services.createdAt, cursorCreatedAt));
+  }
+
+  const queryWhere = queryFilters.length > 0 ? and(...queryFilters) : undefined;
 
   const rows = await db
     .select({
@@ -195,46 +231,7 @@ export async function findAllServicesWithUserPaginated(
     })
     .from(services)
     .innerJoin(users, eq(services.userId, users.id))
-    .where(cursorCreatedAt ? lt(services.createdAt, cursorCreatedAt) : undefined)
-    .orderBy(desc(services.createdAt))
-    .limit(limit + 1);
-
-  const hasNext = rows.length > limit;
-  const data = hasNext ? rows.slice(0, limit) : rows;
-  const nextCursor = hasNext ? data[data.length - 1].id : null;
-
-  return { data, nextCursor, total };
-}
-
-export async function findUserServicesPaginated(
-  userId: string,
-  cursor: string | undefined,
-  limit: number,
-): Promise<PaginatedResponse<ServiceSelect>> {
-  const [totalRes] = await db
-    .select({ value: count() })
-    .from(services)
-    .where(eq(services.userId, userId));
-  const total = totalRes?.value ?? 0;
-
-  let cursorCreatedAt: Date | undefined;
-  if (cursor) {
-    const [cursorItem] = await db
-      .select({ createdAt: services.createdAt })
-      .from(services)
-      .where(eq(services.id, cursor))
-      .limit(1);
-    cursorCreatedAt = cursorItem?.createdAt;
-  }
-
-  const rows = await db
-    .select()
-    .from(services)
-    .where(
-      cursorCreatedAt
-        ? and(eq(services.userId, userId), lt(services.createdAt, cursorCreatedAt))
-        : eq(services.userId, userId),
-    )
+    .where(queryWhere)
     .orderBy(desc(services.createdAt))
     .limit(limit + 1);
 
@@ -253,8 +250,8 @@ export async function updateChecklistItem(
     .update(checklistItems)
     .set({ checked })
     .where(eq(checklistItems.id, id))
-    .returning()
-  return result[0]
+    .returning();
+  return result[0];
 }
 
 export async function getAdminMetrics() {
