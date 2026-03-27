@@ -23,8 +23,16 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       accessToken: null,
-      login: (user, accessToken) => set({ user, accessToken }),
-      logout: () => set({ user: null, accessToken: null }),
+      login: (user, accessToken) => {
+        document.cookie = `auth-token=${accessToken}; path=/; SameSite=Lax`
+        document.cookie = `auth-role=${user.role}; path=/; SameSite=Lax`
+        set({ user, accessToken })
+      },
+      logout: () => {
+        document.cookie = "auth-token=; path=/; max-age=0"
+        document.cookie = "auth-role=; path=/; max-age=0"
+        set({ user: null, accessToken: null })
+      },
       isAdmin: () => get().user?.role === "admin",
     }),
     {
