@@ -22,6 +22,7 @@ import { useAdminMetrics } from "@/hooks/use-admin";
 import { SERVICE_TYPE_LABELS } from "@/lib/constants";
 import type { ServiceType } from "@friodesk/shared";
 import { useAuthStore } from "@/store/auth.store";
+import { PageHeader } from "@/components/ui/page-header";
 
 const CHART_COLORS = [
   "var(--color-chart-1)",
@@ -37,7 +38,6 @@ const SERVICE_TYPES: ServiceType[] = [
   "inspeção",
 ];
 
-// Custom Tooltip Recharts (Aparência Glassmorphism e Premium)
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -98,25 +98,16 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-8 p-1">
-      {/* Header Contextual Premium */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div>
-          <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">
-            Visão Geral
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground font-medium">
-            Bem-vindo de volta, {user?.name?.split(" ")[0] || "Admin"}. Aqui está o resumo atual das operações do FrioDesk.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-9 gap-2 text-muted-foreground">
-            <CalendarDays className="size-4" />
-            <span>Últimos 30 dias</span>
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Visão Geral"
+        description={`Bem-vindo de volta, ${user?.name?.split(" ")[0] || "Admin"}. Aqui está o resumo atual das operações do FrioDesk.`}
+      >
+        <Button variant="outline" size="sm" className="h-9 gap-2 text-muted-foreground">
+          <CalendarDays className="size-4" />
+          <span>Últimos 30 dias</span>
+        </Button>
+      </PageHeader>
 
-      {/* Metrics Grid Staggered Animation */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricsCard
           label="Total de Serviços"
@@ -145,10 +136,8 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      {/* Gráficos em Grid Assimétrico */}
       <div className="grid gap-6 lg:grid-cols-7 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-[500ms]">
         
-        {/* Bar Chart - Premium com Gradient e Arredondamento */}
         <Card className="lg:col-span-4 border-border/40 shadow-sm overflow-hidden flex flex-col">
           <CardHeader className="border-b border-border/10 bg-muted/20 pb-4">
             <CardTitle className="text-base font-semibold">Serviços Segmentados por Tipo</CardTitle>
@@ -190,7 +179,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Donut Chart - Corrigido para Não Quebrar e Sem Wrap Externo */}
         <Card className="lg:col-span-3 border-border/40 shadow-sm flex flex-col">
           <CardHeader className="border-b border-border/10 bg-muted/20 pb-4">
             <CardTitle className="text-base font-semibold">Situação das Ordens</CardTitle>
@@ -211,7 +199,6 @@ export default function AdminDashboardPage() {
                     dataKey="value"
                     stroke="none"
                     animationDuration={1500}
-                    // A correção de UX Premium principal: remover lines pra fora.
                     labelLine={false}
                     label={false}
                   >

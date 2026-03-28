@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { TechniciansTable } from "@/components/admin/technicians-table"
 import { useAdminTechnicians } from "@/hooks/use-admin"
+import { PageHeader } from "@/components/ui/page-header"
 
 const PAGE_SIZE = 8
 
@@ -32,25 +33,16 @@ export default function AdminTechniciansPage() {
 
   return (
     <div className="space-y-6 p-1">
-      {/* Cabeçalho Premium */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div>
-          <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">
-            Diretório de Técnicos
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground font-medium">
-            Gerencie o corpo técnico e credenciais para acesso de campo.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" className="h-9 gap-2 shadow-sm font-semibold">
-            <UserPlus className="size-4" />
-            <span>Adicionar Técnico</span>
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Diretório de Técnicos"
+        description="Gerencie o corpo técnico e credenciais para acesso de campo."
+      >
+        <Button size="sm" className="h-9 gap-2 shadow-sm font-semibold">
+          <UserPlus className="size-4" />
+          <span>Adicionar Técnico</span>
+        </Button>
+      </PageHeader>
 
-      {/* Tabela de Dados (Container com Card) */}
       <Card className="animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-[150ms] border-border/40 shadow-sm overflow-hidden">
         <CardHeader className="border-b border-border/10 bg-muted/10 pb-4">
           <CardTitle className="text-base font-semibold">Efetivo Cadastrado</CardTitle>

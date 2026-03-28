@@ -1,17 +1,21 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, Plus, Wind } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ServiceCard } from "@/components/services/service-card";
 import { useServices } from "@/hooks/use-services";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { CreateServiceModal } from "@/components/services/create-service-modal";
+import { EmptyState } from "@/components/services/empty-state";
+import { useAuthStore } from "@/store/auth.store";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const user = useAuthStore((s) => s.user);
 
   const {
     data,
@@ -32,47 +36,39 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8 px-4">
-      <div className="space-y-1 px-4 py-5">
-        <h2 className="font-heading text-xl font-bold">Meus Serviços</h2>
-        <p className="text-sm text-muted-foreground">
-          {total} serviço{total !== 1 ? "s" : ""} registrado
-          {total !== 1 ? "s" : ""}
-        </p>
-      </div>
+    <div className="relative flex flex-col gap-6 min-h-full max-w-6xl mx-auto py-8 px-4">
+      <PageHeader 
+        title="Área Operacional"
+        description={`Olá, ${user?.name?.split(" ")[0] || "Técnico"}! Você tem ${total} serviço${total !== 1 ? "s" : ""} registrado${total !== 1 ? "s" : ""}.`}
+      >
+        <div className="hidden sm:flex items-center gap-2">
+          <Button onClick={() => setIsModalOpen(true)} className="h-10 px-6 gap-2 shadow-sm font-semibold transition-transform hover:scale-105 active:scale-95 group">
+            <Plus className="size-4 transition-transform group-hover:rotate-90" />
+            <span>Novo Serviço</span>
+          </Button>
+        </div>
+      </PageHeader>
 
-      <div className="">
+      <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-[150ms]">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-18 w-full rounded-xl" />
+              <Skeleton key={i} className="h-44 w-full rounded-xl" />
             ))}
           </div>
         ) : services.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-20 text-center">
-            <div className="flex size-16 items-center justify-center rounded-full bg-muted">
-              <Wind className="size-7 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-heading font-semibold">
-                Nenhum serviço registrado ainda
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Toque no botão abaixo para criar seu primeiro serviço
-              </p>
-            </div>
-
-            {/* BOTÃO MUDADO AQUI */}
-            <Button onClick={() => setIsModalOpen(true)}>
-              <Plus className="size-4" />
-              Novo serviço
-            </Button>
-          </div>
+          <EmptyState onAction={() => setIsModalOpen(true)} />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {services.map((service) => (
-                <ServiceCard key={service.id} service={service} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {services.map((service, idx) => (
+                <div 
+                  key={service.id} 
+                  className="animate-in fade-in zoom-in-95 duration-500 fill-mode-both"
+                  style={{ animationDelay: `${(idx % 8) * 50}ms` }}
+                >
+                  <ServiceCard service={service} />
+                </div>
               ))}
             </div>
 
@@ -80,24 +76,24 @@ export default function DashboardPage() {
             <div ref={sentinelRef} className="h-1" />
 
             {isFetchingNextPage && (
-              <div className="flex justify-center py-4">
-                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              <div className="flex justify-center py-6">
+                <Loader2 className="size-6 animate-spin text-muted-foreground" />
               </div>
             )}
           </>
         )}
-
-        {/* FAB MUDADO AQUI */}
-        {services.length > 0 && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="fixed bottom-20 right-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
-            aria-label="Novo serviço"
-          >
-            <Plus className="size-6" />
-          </button>
-        )}
       </div>
+
+      {/* FAB Exclusivo Mobile (Oculto no Desktop) MOVIDO PARA FORA DO ANIMATE CONTAINER */}
+      {services.length > 0 && (
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="sm:hidden fixed bottom-20 right-4 z-[100] flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:scale-105 active:scale-95 group"
+          aria-label="Novo serviço"
+        >
+          <Plus className="size-6 transition-transform group-hover:rotate-90" />
+        </button>
+      )}
 
       <CreateServiceModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
