@@ -40,7 +40,7 @@ export async function uploadPhoto(
   return photosRepository.createPhoto({ serviceId, url, publicId })
 }
 
-export async function listPhotosByService(serviceId: string): Promise<PhotoSelect[]> {
+export async function getPhotosByServiceId(serviceId: string): Promise<PhotoSelect[]> {
   return photosRepository.findPhotosByServiceId(serviceId)
 }
 

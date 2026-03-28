@@ -19,7 +19,7 @@ const upload = multer({
 
 router.use(authMiddleware)
 
-router.get("/", photosController.getPhotos)
+router.get("/", photosController.getPhotosByServiceId)
 router.post("/", upload.single("photo"), photosController.uploadPhoto)
 router.delete("/:photoId", photosController.deletePhoto)
 

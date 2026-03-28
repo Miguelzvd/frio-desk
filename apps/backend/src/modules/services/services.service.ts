@@ -56,7 +56,7 @@ export async function createService(
   return { ...service, checklist: checklistItems, photos: [] };
 }
 
-export async function listServices(
+export async function getAllServices(
   userId: string,
   role: UserRole,
   pagination: PaginationParams,

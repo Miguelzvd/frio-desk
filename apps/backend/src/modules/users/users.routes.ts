@@ -8,11 +8,11 @@ const router = Router()
 router.use(authMiddleware)
 
 // Rota legada — mantida para compatibilidade (sem verificação de role)
-router.get("/technicians", usersController.listUsers)
+router.get("/technicians", usersController.getAllUsers)
 
 // Rotas admin
 router.post("/", requireRole("admin"), usersController.createUser)
-router.get("/", requireRole("admin"), usersController.listUsers)
+router.get("/", requireRole("admin"), usersController.getAllUsers)
 router.get("/:id/services", requireRole("admin"), usersController.getUserServices)
 router.get("/:id", requireRole("admin"), usersController.getUserById)
 router.patch("/:id", requireRole("admin"), usersController.updateUser)

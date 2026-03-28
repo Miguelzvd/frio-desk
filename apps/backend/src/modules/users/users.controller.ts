@@ -27,7 +27,7 @@ export async function createUser(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function listUsers(req: Request, res: Response): Promise<void> {
+export async function getAllUsers(req: Request, res: Response): Promise<void> {
   try {
     const parsed = paginationQuerySchema.safeParse(req.query)
     if (!parsed.success) {

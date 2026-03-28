@@ -40,7 +40,7 @@ export async function getUserById(id: string): Promise<UserSelect> {
   return user
 }
 
-export async function getUsers(): Promise<UserSelect[]> {
+export async function getAllUsers(): Promise<UserSelect[]> {
   const users = await usersRepository.findUsers()
   return users
 }

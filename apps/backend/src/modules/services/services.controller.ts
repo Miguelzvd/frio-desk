@@ -34,7 +34,7 @@ export async function registerService(
   }
 }
 
-export async function listServices(req: Request, res: Response): Promise<void> {
+export async function getAllServices(req: Request, res: Response): Promise<void> {
   try {
     const parsed = paginationQuerySchema.safeParse(req.query);
     if (!parsed.success) {
@@ -43,7 +43,7 @@ export async function listServices(req: Request, res: Response): Promise<void> {
         .json({ error: parsed.error.issues[0].message, statusCode: 400 });
       return;
     }
-    const services = await servicesService.listServices(
+    const services = await servicesService.getAllServices(
       req.user!.userId,
       req.user!.role,
       { cursor: parsed.data.cursor, limit: parsed.data.limit },
@@ -59,7 +59,7 @@ export async function listServices(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function getService(req: Request, res: Response): Promise<void> {
+export async function getServiceById(req: Request, res: Response): Promise<void> {
   try {
     const service = await servicesService.getServiceDetail(
       req.params.id as string,

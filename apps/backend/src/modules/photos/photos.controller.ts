@@ -16,7 +16,7 @@ export async function deletePhoto(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function getPhotos(req: Request, res: Response): Promise<void> {
+export async function getPhotosByServiceId(req: Request, res: Response): Promise<void> {
   try {
     const photos = await photosRepository.findPhotosByServiceId(
       req.params.id as string,
