@@ -69,7 +69,7 @@ describe("Services Service", () => {
     })
   })
 
-  describe("listServices", () => {
+  describe("getAllServices", () => {
     it("deve listar apenas serviços do usuário autenticado paginados", async () => {
       const paginatedResult = {
         data: [fakeService],
@@ -79,7 +79,7 @@ describe("Services Service", () => {
 
       mockRepo.findServicesByUserIdPaginated.mockResolvedValue(paginatedResult)
 
-      const result = await servicesService.listServices(userId, "technician" as UserRole, {})
+      const result = await servicesService.getAllServices(userId, "technician" as UserRole, {})
 
       expect(result.data).toHaveLength(1)
       expect(result.data[0].userId).toBe(userId)
@@ -95,7 +95,7 @@ describe("Services Service", () => {
 
       mockRepo.findServicesByUserIdPaginated.mockResolvedValue(paginatedResult)
 
-      await servicesService.listServices(userId, "technician" as UserRole, { limit: 10 }, "preventiva", "open")
+      await servicesService.getAllServices(userId, "technician" as UserRole, { limit: 10 }, "preventiva", "open")
 
       expect(mockRepo.findServicesByUserIdPaginated).toHaveBeenCalledWith(userId, undefined, 10, "preventiva", "open")
     })
@@ -109,7 +109,7 @@ describe("Services Service", () => {
 
       mockRepo.findAllServicesWithUserPaginated.mockResolvedValue(paginatedResult)
 
-      await servicesService.listServices(userId, "admin" as UserRole, {}, "preventiva", "open")
+      await servicesService.getAllServices(userId, "admin" as UserRole, {}, "preventiva", "open")
 
       expect(mockRepo.findAllServicesWithUserPaginated).toHaveBeenCalledWith(undefined, 8, "preventiva", "open")
     })

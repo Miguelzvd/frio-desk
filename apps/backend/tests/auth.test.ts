@@ -1,12 +1,15 @@
 import { describe, it, expect, beforeAll, beforeEach, jest } from "@jest/globals"
 import * as authService from "../src/modules/auth/auth.service"
-import * as authRepository from "../src/modules/auth/auth.repository"
+import * as userRepository from "../src/modules/users/users.repository"
+import * as usersService from "../src/modules/users/users.service"
 import bcrypt from "bcrypt"
 
-jest.mock("../src/modules/auth/auth.repository")
+jest.mock("../src/modules/users/users.repository")
+jest.mock("../src/modules/users/users.service")
 jest.mock("../src/db", () => ({ db: {} }))
 
-const mockRepo = authRepository as jest.Mocked<typeof authRepository>
+const mockUserRepo = userRepository as jest.Mocked<typeof userRepository>
+const mockUsersService = usersService as jest.Mocked<typeof usersService>
 
 const fakeUser = {
   id: "user-uuid-1",
@@ -28,8 +31,13 @@ beforeEach(() => {
 describe("Auth Service", () => {
   describe("register", () => {
     it("deve registrar um novo usuário com sucesso", async () => {
-      mockRepo.findUserByEmail.mockResolvedValue(undefined)
-      mockRepo.createUser.mockResolvedValue(fakeUser)
+      mockUsersService.createUser.mockResolvedValue({
+        id: fakeUser.id,
+        name: fakeUser.name,
+        email: fakeUser.email,
+        role: fakeUser.role,
+        createdAt: fakeUser.createdAt,
+      })
 
       const result = await authService.register("João Silva", "joao@example.com", "senha123")
 
@@ -37,23 +45,23 @@ describe("Auth Service", () => {
       expect(result.user.name).toBe("João Silva")
       expect(result.tokens.accessToken).toBeDefined()
       expect(result.tokens.refreshToken).toBeDefined()
-      expect(mockRepo.createUser).toHaveBeenCalledTimes(1)
+      expect(mockUsersService.createUser).toHaveBeenCalledTimes(1)
     })
 
     it("deve falhar ao registrar email duplicado", async () => {
-      mockRepo.findUserByEmail.mockResolvedValue(fakeUser)
+      mockUsersService.createUser.mockRejectedValue(
+        Object.assign(new Error("Email já cadastrado"), { statusCode: 409 })
+      )
 
       await expect(
         authService.register("Outro Nome", "joao@example.com", "senha123")
       ).rejects.toMatchObject({ message: "Email já cadastrado", statusCode: 409 })
-
-      expect(mockRepo.createUser).not.toHaveBeenCalled()
     })
   })
 
   describe("login", () => {
     it("deve fazer login com credenciais válidas", async () => {
-      mockRepo.findUserByEmail.mockResolvedValue(fakeUser)
+      mockUserRepo.findUserByEmail.mockResolvedValue(fakeUser)
 
       const result = await authService.login("joao@example.com", "senha123")
 
@@ -63,7 +71,7 @@ describe("Auth Service", () => {
     })
 
     it("deve rejeitar login com senha errada", async () => {
-      mockRepo.findUserByEmail.mockResolvedValue(fakeUser)
+      mockUserRepo.findUserByEmail.mockResolvedValue(fakeUser)
 
       await expect(
         authService.login("joao@example.com", "senhaerrada")
@@ -71,7 +79,7 @@ describe("Auth Service", () => {
     })
 
     it("deve rejeitar login com email inexistente", async () => {
-      mockRepo.findUserByEmail.mockResolvedValue(undefined)
+      mockUserRepo.findUserByEmail.mockResolvedValue(undefined)
 
       await expect(
         authService.login("naoexiste@example.com", "senha123")

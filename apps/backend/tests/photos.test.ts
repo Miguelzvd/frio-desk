@@ -145,7 +145,7 @@ describe("Photos Service", () => {
     });
   });
 
-  describe("listPhotosByService", () => {
+  describe("getPhotosByServiceId", () => {
     it("deve listar fotos de um serviço com sucesso", async () => {
       const segundaFoto = {
         ...fakePhoto,
@@ -157,7 +157,7 @@ describe("Photos Service", () => {
         segundaFoto,
       ]);
 
-      const result = await photosService.listPhotosByService(serviceId);
+      const result = await photosService.getPhotosByServiceId(serviceId);
 
       expect(result).toHaveLength(2);
       expect(result[0].serviceId).toBe(serviceId);
@@ -170,7 +170,7 @@ describe("Photos Service", () => {
     it("deve retornar array vazio quando serviço não tiver fotos", async () => {
       mockPhotosRepo.findPhotosByServiceId.mockResolvedValue([]);
 
-      const result = await photosService.listPhotosByService(serviceId);
+      const result = await photosService.getPhotosByServiceId(serviceId);
 
       expect(result).toHaveLength(0);
       expect(mockPhotosRepo.findPhotosByServiceId).toHaveBeenCalledWith(
