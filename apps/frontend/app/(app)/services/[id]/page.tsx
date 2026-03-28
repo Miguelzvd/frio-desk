@@ -25,6 +25,10 @@ import {
 import { SERVICE_TYPE_LABELS, SERVICE_STATUS_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
+import { PageHeader } from "@/components/ui/page-header";
+
+import { PageContainer } from "@/components/ui/page-container";
+
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -41,7 +45,6 @@ export default function ServiceDetailPage({ params }: Props) {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [notes, setNotes] = useState<string | null>(null);
 
-  // Inicializa notes com o valor atual do serviço (apenas uma vez)
   if (service && notes === null) {
     setNotes(service.notes ?? "");
   }
@@ -67,10 +70,10 @@ export default function ServiceDetailPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="space-y-4 px-4 py-5">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-40 w-full rounded-xl" />
-        <Skeleton className="h-56 w-full rounded-xl" />
+      <div className="space-y-4 px-4 py-8 max-w-6xl mx-auto">
+        <Skeleton className="h-14 w-full md:w-1/2 lg:w-1/3 rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
       </div>
     );
   }
@@ -83,155 +86,160 @@ export default function ServiceDetailPage({ params }: Props) {
 
   return (
     <>
-      <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8 px-4">
-        {/* Back + Title */}
-        <div className="flex items-start gap-3">
-          <Button
-            render={<Link href="/dashboard" />}
-            nativeButton={false}
-            variant="ghost"
-            size="icon"
-            className="mt-0.5 size-9 shrink-0"
-          >
-            <ArrowLeft className="size-4" />
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h2 className="font-heading text-xl font-bold leading-none">
-                {SERVICE_TYPE_LABELS[service.type]}
-              </h2>
-              <Badge
-                className={cn(
-                  "text-[10px]",
-                  isFinished
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                    : "bg-amber-500/15 text-amber-700 dark:text-amber-400",
-                )}
+      <PageContainer>
+        <PageHeader
+          title={
+            <div className="flex items-center gap-3">
+              <Button
+                render={<Link href="/dashboard" />}
+                nativeButton={false}
+                variant="ghost"
+                size="icon"
+                className="size-10"
               >
-                {SERVICE_STATUS_LABELS[service.status]}
-              </Badge>
+                <ArrowLeft className="size-4" />
+              </Button>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span>{SERVICE_TYPE_LABELS[service.type]}</span>
+                <Badge
+                  className={cn(
+                    "text-[10px] w-fit font-bold uppercase tracking-wider shadow-none border",
+                    isFinished
+                      ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/5"
+                      : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/5"
+                  )}
+                >
+                  {SERVICE_STATUS_LABELS[service.status]}
+                </Badge>
+              </div>
             </div>
-            <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+          }
+          description={
+            <span className="font-mono mt-1 text-sm inline-block px-1.5 py-0.5 rounded bg-muted/50 border border-border/40">
               #{id.slice(0, 8).toUpperCase()}
-            </p>
+            </span>
+          }
+        />
+
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-[150ms]">
+          
+          <div className="md:col-span-8 space-y-6">
+            {service.checklist && (
+              <div className="rounded-2xl border border-border/40 shadow-sm bg-card p-5 sm:p-6 transition-colors hover:border-border">
+                <Checklist
+                  items={service.checklist}
+                  serviceId={id}
+                  readOnly={isFinished}
+                  onToggle={handleToggle}
+                />
+              </div>
+            )}
+
+            {!isFinished && (
+              <div className="rounded-2xl border border-border/40 shadow-sm bg-card p-5 sm:p-6 transition-colors hover:border-border">
+                <PhotoUpload serviceId={id} />
+              </div>
+            )}
           </div>
+
+          <div className="md:col-span-4 space-y-6">
+            {canEditNotes ? (
+              <div className="rounded-2xl border border-border/40 shadow-sm bg-card p-5 sm:p-6 space-y-3 transition-colors hover:border-border">
+                <p className="font-heading font-semibold text-foreground/90">Apontamentos</p>
+                <textarea
+                  rows={6}
+                  maxLength={500}
+                  value={currentNotes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Relate os detalhes operacionais..."
+                  className="w-full rounded-xl border border-input bg-muted/20 px-3.5 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 resize-none"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {currentNotes.length}/500
+                  </span>
+                  <Button
+                    size="sm"
+                    className="gap-2"
+                    onClick={handleSaveNotes}
+                    disabled={savingNotes}
+                  >
+                    {savingNotes ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Save className="size-3.5" />
+                    )}
+                    Salvar Dados
+                  </Button>
+                </div>
+              </div>
+            ) : isFinished && service.notes ? (
+              <div className="rounded-2xl border border-border/40 shadow-sm bg-card p-5 sm:p-6 space-y-2">
+                <p className="font-heading font-semibold text-foreground/90">Apontamentos da OS</p>
+                <div className="p-3.5 rounded-xl bg-muted/30 border border-border/40">
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                    {service.notes}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+
+            {!isFinished && (
+              <div className="rounded-2xl border border-border/40 shadow-sm bg-card p-5 sm:p-6 space-y-3">
+                <p className="font-heading font-semibold text-foreground/90">Controle Operacional</p>
+                <div className="space-y-2.5">
+                  <Button
+                    className="w-full gap-2"
+                    onClick={handleFinish}
+                    disabled={finishing}
+                  >
+                    {finishing ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="size-4" />
+                    )}
+                    {finishing ? "Finalizando..." : "Concluir Manutenção"}
+                  </Button>
+
+                  <Button
+                    variant="destructive"
+                    className="w-full gap-2"
+                    onClick={() => setCancelOpen(true)}
+                    disabled={deleting}
+                  >
+                    <Trash2 className="size-4" />
+                    Cancelar O.S.
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
+      </PageContainer>
 
-        {/* Checklist */}
-        {service.checklist && (
-          <div className="rounded-xl border border-border bg-card p-4">
-            <Checklist
-              items={service.checklist}
-              serviceId={id}
-              readOnly={isFinished}
-              onToggle={handleToggle}
-            />
-          </div>
-        )}
-
-        {/* Observação do serviço — editável */}
-        {canEditNotes && (
-          <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-            <p className="text-sm font-semibold">Observação do serviço</p>
-            <textarea
-              rows={4}
-              maxLength={500}
-              value={currentNotes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Descreva detalhes do atendimento..."
-              className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
-            />
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">
-                {currentNotes.length}/500
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5"
-                onClick={handleSaveNotes}
-                disabled={savingNotes}
-              >
-                {savingNotes ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Save className="size-3.5" />
-                )}
-                Salvar observação
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Observação do serviço — somente leitura */}
-        {isFinished && service.notes && (
-          <div className="rounded-xl border border-border bg-card p-4 space-y-1">
-            <p className="text-sm font-semibold">Observação do serviço</p>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {service.notes}
-            </p>
-          </div>
-        )}
-
-        {/* Photos */}
-        {!isFinished && (
-          <div className="rounded-xl border border-border bg-card p-4">
-            <PhotoUpload serviceId={id} />
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="space-y-2 pb-2">
-          {!isFinished && (
-            <>
-              <Button
-                className="w-full gap-2"
-                onClick={handleFinish}
-                disabled={finishing}
-              >
-                {finishing ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="size-4" />
-                )}
-                {finishing ? "Finalizando..." : "Finalizar serviço"}
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full gap-2 text-destructive hover:text-destructive"
-                onClick={() => setCancelOpen(true)}
-                disabled={deleting}
-              >
-                <Trash2 className="size-4" />
-                Cancelar serviço
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Dialog de confirmação de cancelamento */}
       {cancelOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center animate-in fade-in duration-300">
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setCancelOpen(false)}
           />
-          <div className="relative z-10 mx-4 w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-xl">
-            <h3 className="font-heading text-lg font-bold">Cancelar serviço</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Tem certeza que deseja cancelar este serviço? Esta ação não pode
-              ser desfeita.
+          <div className="relative z-10 mx-4 w-full max-w-md rounded-2xl border border-border/40 bg-card p-8 shadow-2xl animate-in fade-in zoom-in-95 slide-in-from-bottom-4">
+            <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-5 ring-1 ring-destructive/20">
+              <Trash2 className="size-6" />
+            </div>
+            <h3 className="font-heading text-xl font-bold">Cancelar Ordem de Serviço</h3>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Você está prestes a excluir o registro desta O.S. permanentemente. Deseja prosseguir com o cancelamento imediato?
             </p>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-8 flex gap-3">
               <Button
                 variant="outline"
                 className="flex-1"
                 onClick={() => setCancelOpen(false)}
                 disabled={deleting}
               >
-                Voltar
+                Retornar
               </Button>
               <Button
                 variant="destructive"
@@ -240,7 +248,7 @@ export default function ServiceDetailPage({ params }: Props) {
                 disabled={deleting}
               >
                 {deleting && <Loader2 className="size-4 animate-spin" />}
-                Confirmar cancelamento
+                Sim, Cancelar
               </Button>
             </div>
           </div>

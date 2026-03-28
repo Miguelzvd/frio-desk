@@ -7,6 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/store/auth.store";
 import Link from "next/link";
 
+import { PageHeader } from "@/components/ui/page-header";
+
+import { PageContainer } from "@/components/ui/page-container";
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
@@ -17,50 +21,60 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="relative flex flex-col gap-5 min-h-full max-w-6xl mx-auto py-8 px-4">
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-9"
-          nativeButton={false}
-          render={<Link href="/dashboard" />}
-        >
-          <ArrowLeft className="size-4" />
-        </Button>
-
-        <h2 className="font-heading text-xl font-bold leading-none">Perfil </h2>
-      </div>
-
-      <Card>
-        <CardContent className="pt-5">
-          <div className="flex items-center gap-4">
-            <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
-              <User className="size-7 text-primary" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-heading font-semibold truncate">
-                {user?.name}
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground truncate">
-                {user?.email}
-              </p>
-              <p className="mt-1 inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                Técnico
-              </p>
-            </div>
+    <PageContainer>
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-9"
+              nativeButton={false}
+              render={<Link href="/dashboard" />}
+            >
+              <ArrowLeft className="size-4" />
+            </Button>
+            <span>Minha Conta</span>
           </div>
-        </CardContent>
-      </Card>
+        }
+        description="Gerencie seus dados e acesse as configurações."
+      />
 
-      <Button
-        variant="outline"
-        className="w-full gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-        onClick={handleLogout}
-      >
-        <LogOut className="size-4" />
-        Sair da conta
-      </Button>
-    </div>
+      <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-[150ms] max-w-2xl w-full">
+        <Card className="border-border/40 shadow-sm transition-all hover:shadow-md">
+          <CardContent className="pt-6 pb-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="flex size-20 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20 shadow-inner">
+                <User className="size-10 text-primary" />
+              </div>
+              <div className="min-w-0 text-center sm:text-left flex-1">
+                <p className="font-heading text-xl font-bold truncate text-foreground">
+                  {user?.name}
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-muted-foreground truncate">
+                  {user?.email}
+                </p>
+                <div className="mt-3">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary">
+                    Técnico Operacional
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="mt-6 flex flex-col gap-3">
+          <Button
+            variant="destructive"
+            className="w-full gap-2"
+            onClick={handleLogout}
+          >
+            <LogOut className="size-4" />
+            Encerrar Sessão
+          </Button>
+        </div>
+      </div>
+    </PageContainer>
   );
 }

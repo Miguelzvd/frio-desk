@@ -12,6 +12,8 @@ import { EmptyState } from "@/components/services/empty-state";
 import { useAuthStore } from "@/store/auth.store";
 import { PageHeader } from "@/components/ui/page-header";
 
+import { PageContainer } from "@/components/ui/page-container";
+
 export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -36,14 +38,14 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="relative flex flex-col gap-6 min-h-full max-w-6xl mx-auto py-8 px-4">
+    <PageContainer>
       <PageHeader 
         title="Área Operacional"
         description={`Olá, ${user?.name?.split(" ")[0] || "Técnico"}! Você tem ${total} serviço${total !== 1 ? "s" : ""} registrado${total !== 1 ? "s" : ""}.`}
       >
         <div className="hidden sm:flex items-center gap-2">
-          <Button onClick={() => setIsModalOpen(true)} className="h-10 px-6 gap-2 shadow-sm font-semibold transition-transform hover:scale-105 active:scale-95 group">
-            <Plus className="size-4 transition-transform group-hover:rotate-90" />
+          <Button onClick={() => setIsModalOpen(true)} className="gap-2">
+            <Plus className="size-4" />
             <span>Novo Serviço</span>
           </Button>
         </div>
@@ -72,7 +74,6 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* Sentinel para IntersectionObserver */}
             <div ref={sentinelRef} className="h-1" />
 
             {isFetchingNextPage && (
@@ -84,18 +85,17 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* FAB Exclusivo Mobile (Oculto no Desktop) MOVIDO PARA FORA DO ANIMATE CONTAINER */}
       {services.length > 0 && (
         <button
           onClick={() => setIsModalOpen(true)}
-          className="sm:hidden fixed bottom-20 right-4 z-[100] flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform hover:scale-105 active:scale-95 group"
+          className="sm:hidden fixed bottom-20 right-4 z-[100] flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform active:scale-95 cursor-pointer"
           aria-label="Novo serviço"
         >
-          <Plus className="size-6 transition-transform group-hover:rotate-90" />
+          <Plus className="size-6" />
         </button>
       )}
 
       <CreateServiceModal open={isModalOpen} onOpenChange={setIsModalOpen} />
-    </div>
+    </PageContainer>
   );
 }
