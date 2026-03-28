@@ -8,13 +8,14 @@ const router = Router()
 router.use(authMiddleware)
 
 // Rota legada — mantida para compatibilidade (sem verificação de role)
-router.get("/technicians", usersController.listUsersController)
+router.get("/technicians", usersController.listUsers)
 
 // Rotas admin
-router.get("/", requireRole("admin"), usersController.listUsersController)
-router.get("/:id/services", requireRole("admin"), usersController.getUserServicesController)
-router.get("/:id", requireRole("admin"), usersController.getUserController)
-router.patch("/:id", requireRole("admin"), usersController.updateUserController)
-router.delete("/:id", requireRole("admin"), usersController.deleteUserController)
+router.post("/", requireRole("admin"), usersController.createUser)
+router.get("/", requireRole("admin"), usersController.listUsers)
+router.get("/:id/services", requireRole("admin"), usersController.getUserServices)
+router.get("/:id", requireRole("admin"), usersController.getUserById)
+router.patch("/:id", requireRole("admin"), usersController.updateUser)
+router.delete("/:id", requireRole("admin"), usersController.deleteUser)
 
 export default router

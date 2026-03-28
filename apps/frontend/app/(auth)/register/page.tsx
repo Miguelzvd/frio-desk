@@ -24,7 +24,6 @@ type FormValues = z.infer<typeof schema>;
 
 interface RegisterResponse {
   user: { id: string; name: string; email: string; role: string };
-  tokens: { accessToken: string; refreshToken: string };
 }
 
 export default function RegisterPage() {

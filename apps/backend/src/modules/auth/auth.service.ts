@@ -2,16 +2,15 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { UserPublic, UserRole } from "@friodesk/shared"
 import { JwtPayload } from "../../middlewares/auth"
-import * as authRepository from "./auth.repository"
+import * as userRepository from "../users/users.repository"
+import * as usersService from "../users/users.service"
 
-const SALT_ROUNDS = 10
-
-interface AuthTokens {
+export interface AuthTokens {
   accessToken: string
   refreshToken: string
 }
 
-interface AuthResult {
+export interface AuthResult {
   user: UserPublic
   tokens: AuthTokens
 }
@@ -37,24 +36,8 @@ export async function register(
   email: string,
   password: string
 ): Promise<AuthResult> {
-  const existing = await authRepository.findUserByEmail(email)
-
-  if (existing) {
-    throw Object.assign(new Error("Email já cadastrado"), { statusCode: 409 })
-  }
-
-  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
-  const created = await authRepository.createUser({ name, email, passwordHash })
-
-  const tokens = generateTokens(created.id, created.role)
-
-  const user: UserPublic = {
-    id: created.id,
-    name: created.name,
-    email: created.email,
-    role: created.role,
-    createdAt: created.createdAt,
-  }
+  const user = await usersService.createUser(name, email, password)
+  const tokens = generateTokens(user.id, user.role)
 
   return { user, tokens }
 }
@@ -63,7 +46,7 @@ export async function login(
   email: string,
   password: string
 ): Promise<AuthResult> {
-  const found = await authRepository.findUserByEmail(email)
+  const found = await userRepository.findUserByEmail(email)
 
   if (!found) {
     throw Object.assign(new Error("Credenciais inválidas"), { statusCode: 401 })

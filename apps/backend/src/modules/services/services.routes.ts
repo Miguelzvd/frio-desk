@@ -6,7 +6,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.post("/", servicesController.createService);
+router.post("/", servicesController.registerService);
 router.get("/", servicesController.listServices);
 router.get("/metrics", servicesController.getMetricsController);
 

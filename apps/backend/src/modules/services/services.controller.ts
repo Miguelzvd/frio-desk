@@ -8,7 +8,7 @@ import {
 import * as servicesService from "./services.service";
 import * as servicesRepository from "./services.repository";
 
-export async function createService(
+export async function registerService(
   req: Request,
   res: Response,
 ): Promise<void> {

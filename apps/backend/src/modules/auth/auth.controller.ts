@@ -2,24 +2,7 @@ import { Request, Response } from "express";
 import * as authService from "./auth.service";
 import * as usersService from "../users/users.service";
 import { loginSchema, refreshSchema, registerSchema } from "./auth.schema";
-
-
-function clearToken(res: Response, tokenName: string) {
-  res.clearCookie(tokenName, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
-}
-
-function setToken(res: Response, tokenName: string, token: string) {
-  res.cookie(tokenName, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
-}
+import { clearToken, setToken } from "./auth.utils";
 
 export async function register(req: Request, res: Response): Promise<void> {
   try {

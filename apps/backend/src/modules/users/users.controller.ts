@@ -1,18 +1,40 @@
 import { Request, Response } from "express"
-import { getAdminTechniciansPaginated } from "./users.repository"
+import { findAdminTechniciansPaginated } from "./users.repository"
 import * as usersService from "./users.service"
 import * as servicesRepository from "../services/services.repository"
-import { updateUserSchema } from "./users.schema"
+import { updateUserSchema, createUserSchema } from "./users.schema"
 import { paginationQuerySchema } from "../../shared/pagination.schema"
 
-export async function listUsersController(req: Request, res: Response): Promise<void> {
+export async function createUser(req: Request, res: Response): Promise<void> {
+  try {
+    const parsed = createUserSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: parsed.error.issues[0].message,
+        statusCode: 400,
+      });
+      return;
+    }
+
+    const { name, email, password } = parsed.data;
+    const user = await usersService.createUser(name, email, password);
+    
+    res.status(201).json({ user });
+  } catch (err) {
+    const error = err as Error & { statusCode?: number };
+    const statusCode = error.statusCode ?? 500;
+    res.status(statusCode).json({ error: error.message, statusCode });
+  }
+}
+
+export async function listUsers(req: Request, res: Response): Promise<void> {
   try {
     const parsed = paginationQuerySchema.safeParse(req.query)
     if (!parsed.success) {
       res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 })
       return
     }
-    const result = await getAdminTechniciansPaginated(parsed.data.cursor, parsed.data.limit)
+    const result = await findAdminTechniciansPaginated(parsed.data.cursor, parsed.data.limit)
     res.json(result)
   } catch (err) {
     const error = err as Error & { statusCode?: number }
@@ -22,7 +44,7 @@ export async function listUsersController(req: Request, res: Response): Promise<
   }
 }
 
-export async function getUserController(req: Request, res: Response): Promise<void> {
+export async function getUserById(req: Request, res: Response): Promise<void> {
   try {
     const user = await usersService.getUserById(req.params.id as string)
     res.json(user)
@@ -34,7 +56,7 @@ export async function getUserController(req: Request, res: Response): Promise<vo
   }
 }
 
-export async function getUserServicesController(
+export async function getUserServices(
   req: Request,
   res: Response,
 ): Promise<void> {
@@ -58,7 +80,7 @@ export async function getUserServicesController(
   }
 }
 
-export async function updateUserController(req: Request, res: Response): Promise<void> {
+export async function updateUser(req: Request, res: Response): Promise<void> {
   try {
     const parsed = updateUserSchema.safeParse(req.body)
     if (!parsed.success) {
@@ -77,7 +99,7 @@ export async function updateUserController(req: Request, res: Response): Promise
   }
 }
 
-export async function deleteUserController(req: Request, res: Response): Promise<void> {
+export async function deleteUser(req: Request, res: Response): Promise<void> {
   try {
     await usersService.deleteUser(req.params.id as string)
     res.status(204).send()
