@@ -4,11 +4,10 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store/auth.store";
 import Link from "next/link";
-
 import { PageHeader } from "@/components/ui/page-header";
-
 import { PageContainer } from "@/components/ui/page-container";
 
 export default function ProfilePage() {
@@ -19,6 +18,32 @@ export default function ProfilePage() {
     logout();
     router.replace("/login");
   };
+
+  if (!user) {
+    return (
+      <PageContainer>
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-9 rounded-md" />
+          <Skeleton className="h-8 w-40 rounded-lg" />
+        </div>
+        <div className="max-w-2xl w-full mt-4">
+          <Card className="border-border/40 shadow-sm">
+            <CardContent className="pt-6 pb-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <Skeleton className="size-20 rounded-full shrink-0" />
+                <div className="space-y-2 w-full">
+                  <Skeleton className="h-6 w-44 rounded-md" />
+                  <Skeleton className="h-4 w-56 rounded-md" />
+                  <Skeleton className="h-6 w-28 rounded-full mt-1" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Skeleton className="mt-6 h-10 w-full rounded-md" />
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
