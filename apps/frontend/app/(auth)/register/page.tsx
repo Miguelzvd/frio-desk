@@ -46,8 +46,15 @@ export default function RegisterPage() {
       router.replace("/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
+        if (err.code === "ERR_NETWORK" || err.status === 500) {
+          toast.error("Erro de conexão com servidor");
+          return;
+        }
         toast.error(err.response?.data?.message ?? "Erro ao criar conta");
+        return;
       }
+      toast.error("Erro desconhecido");
+      return;
     }
   };
 

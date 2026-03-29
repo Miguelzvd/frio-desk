@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
       router.replace("/admin/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        if (err.code === "ERR_NETWORK") {
+        if (err.code === "ERR_NETWORK" || err.status === 500) {
           toast.error("Erro de conexão com servidor");
           return;
         }
