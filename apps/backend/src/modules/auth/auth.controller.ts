@@ -64,7 +64,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 export async function refresh(req: Request, res: Response): Promise<void> {
   try {
     const tokenSource = {
-      refreshToken: req.body.refreshToken || req.cookies?.refreshToken,
+      refreshToken: req.body?.refreshToken || req.cookies?.refreshToken,
     };
     
     if (!tokenSource.refreshToken) {
