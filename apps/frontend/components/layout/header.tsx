@@ -20,7 +20,9 @@ export function Header() {
 
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <UserNav />
+          <div className="hidden sm:block">
+            <UserNav />
+          </div>
         </div>
       </div>
     </header>
