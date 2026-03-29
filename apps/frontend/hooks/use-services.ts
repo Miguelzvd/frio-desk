@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import axios from "axios"
+import { handleApiError } from "@/lib/error-handler"
 import api from "@/lib/api"
 import { buildCursorQuery } from "@/lib/pagination"
 import type { ServiceType, ChecklistItem, PaginatedResponse } from "@friodesk/shared"
@@ -46,9 +46,7 @@ export function useServiceDetail(id: string) {
       )
       setService(res.data)
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao carregar serviço")
-      }
+      handleApiError(err, "Erro ao carregar serviço")
     } finally {
       setLoading(false)
     }
@@ -77,9 +75,7 @@ export function useCreateService() {
       await queryClient.invalidateQueries({ queryKey: ["admin", "services"] })
       return res.data
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao criar serviço")
-      }
+      handleApiError(err, "Erro ao criar serviço")
       return null
     } finally {
       setLoading(false)
@@ -98,9 +94,7 @@ export function useToggleChecklist() {
     try {
       await api.patch(`/services/${serviceId}/checklist/${itemId}`, { checked })
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error("Erro ao atualizar checklist")
-      }
+      handleApiError(err, "Erro ao atualizar checklist")
     }
   }
 
@@ -120,9 +114,7 @@ export function useFinishService() {
       await queryClient.invalidateQueries({ queryKey: ["admin", "services"] })
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao finalizar serviço")
-      }
+      handleApiError(err, "Erro ao finalizar serviço")
       return false
     } finally {
       setLoading(false)
@@ -145,9 +137,7 @@ export function useDeleteService() {
       await queryClient.invalidateQueries({ queryKey: ["admin", "services"] })
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao cancelar serviço")
-      }
+      handleApiError(err, "Erro ao cancelar serviço")
       return false
     } finally {
       setLoading(false)
@@ -170,9 +160,7 @@ export function useSaveNotes() {
       await queryClient.invalidateQueries({ queryKey: ["admin", "services"] })
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao salvar observação")
-      }
+      handleApiError(err, "Erro ao salvar observação")
       return false
     } finally {
       setLoading(false)

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
+import { handleApiError } from "@/lib/error-handler";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,16 +47,7 @@ export default function AdminLoginPage() {
       login(res.data.user);
       router.replace("/admin/dashboard");
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        if (err.code === "ERR_NETWORK" || err.status === 500) {
-          toast.error("Erro de conexão com servidor");
-          return;
-        }
-        toast.error(err.response?.data?.message ?? "Credenciais inválidas");
-        return;
-      }
-      toast.error("Erro desconhecido");
-      return;
+      handleApiError(err, "Credenciais inválidas");
     }
   };
 

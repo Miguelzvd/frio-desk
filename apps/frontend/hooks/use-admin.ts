@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
-import axios from "axios";
+import { handleApiError } from "@/lib/error-handler";
 import api from "@/lib/api";
 import { buildCursorQuery } from "@/lib/pagination";
 import type {
@@ -74,9 +73,7 @@ export function useAdminServiceDetail(id: string) {
       const res = await api.get<AdminServiceDetail>(`/services/${id}`);
       setService(res.data);
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao carregar serviço");
-      }
+      handleApiError(err, "Erro ao carregar serviço");
     } finally {
       setLoading(false);
     }
@@ -112,9 +109,7 @@ export function useAdminMetrics() {
       const res = await api.get<AdminMetrics>("/services/metrics");
       setMetrics(res.data);
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao carregar métricas");
-      }
+      handleApiError(err, "Erro ao carregar métricas");
     } finally {
       setLoading(false);
     }

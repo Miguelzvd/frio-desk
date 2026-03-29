@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { toast } from "sonner"
-import axios from "axios"
+import { handleApiError } from "@/lib/error-handler"
 import api from "@/lib/api"
 import type { Photo } from "@friodesk/shared"
 
@@ -16,9 +16,7 @@ export function usePhotos(serviceId: string) {
       const res = await api.get<Photo[]>(`/services/${serviceId}/photos`)
       setPhotos(res.data)
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message ?? "Erro ao carregar fotos")
-      }
+      handleApiError(err, "Erro ao carregar fotos")
     } finally {
       setLoading(false)
     }
@@ -45,9 +43,7 @@ export function useUploadPhoto(serviceId: string) {
       toast.success("Foto enviada com sucesso!")
       return res.data
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message ?? "Erro ao enviar foto")
-      }
+      handleApiError(err, "Erro ao enviar foto")
       return null
     } finally {
       setUploading(false)
@@ -67,9 +63,7 @@ export function useDeletePhoto(serviceId: string) {
       toast.success("Foto removida.")
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error ?? "Erro ao remover foto")
-      }
+      handleApiError(err, "Erro ao remover foto")
       return false
     } finally {
       setDeleting(false)

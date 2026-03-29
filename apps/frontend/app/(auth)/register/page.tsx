@@ -6,8 +6,8 @@ import { z } from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Wind } from "lucide-react";
-import { toast } from "sonner";
-import axios from "axios";
+import { handleApiError } from "@/lib/error-handler";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,16 +45,7 @@ export default function RegisterPage() {
       login(res.data.user);
       router.replace("/dashboard");
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        if (err.code === "ERR_NETWORK" || err.status === 500) {
-          toast.error("Erro de conexão com servidor");
-          return;
-        }
-        toast.error(err.response?.data?.message ?? "Erro ao criar conta");
-        return;
-      }
-      toast.error("Erro desconhecido");
-      return;
+      handleApiError(err, "Erro ao criar conta");
     }
   };
 
