@@ -1,4 +1,4 @@
-import { eq, and, count, lt, desc, SQL } from "drizzle-orm"; // <-- SQL adicionado aqui
+import { eq, and, count, lt, desc, gte, sql, SQL } from "drizzle-orm";
 import { db } from "../../db";
 import {
   services,
@@ -254,13 +254,49 @@ export async function updateChecklistItem(
   return result[0];
 }
 
-export async function getAdminMetrics() {
-  const totalRes = await db.select({ value: count() }).from(services);
+export async function getAvailablePeriods(): Promise<
+  { year: number; month: number }[]
+> {
+  const rows = await db
+    .selectDistinct({
+      year: sql<number>`EXTRACT(YEAR FROM ${services.createdAt})::int`,
+      month: sql<number>`EXTRACT(MONTH FROM ${services.createdAt})::int`,
+    })
+    .from(services)
+    .orderBy(
+      desc(sql`EXTRACT(YEAR FROM ${services.createdAt})`),
+      desc(sql`EXTRACT(MONTH FROM ${services.createdAt})`),
+    );
+  return rows;
+}
+
+export async function getAdminMetrics(year?: number, month?: number) {
+  const periodFilters: SQL<unknown>[] = [];
+
+  if (year !== undefined && month !== undefined) {
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 1);
+    periodFilters.push(gte(services.createdAt, start));
+    periodFilters.push(lt(services.createdAt, end));
+  } else if (year !== undefined) {
+    const start = new Date(year, 0, 1);
+    const end = new Date(year + 1, 0, 1);
+    periodFilters.push(gte(services.createdAt, start));
+    periodFilters.push(lt(services.createdAt, end));
+  }
+
+  const where = periodFilters.length > 0 ? and(...periodFilters) : undefined;
+
+  const totalRes = await db
+    .select({ value: count() })
+    .from(services)
+    .where(where);
   const totalServices = totalRes[0]?.value || 0;
 
   const statusRes = await db
     .select({ status: services.status, value: count() })
     .from(services)
+    .where(where)
     .groupBy(services.status);
 
   const openServices = statusRes.find((s) => s.status === "open")?.value || 0;
@@ -270,6 +306,7 @@ export async function getAdminMetrics() {
   const typeRes = await db
     .select({ type: services.type, value: count() })
     .from(services)
+    .where(where)
     .groupBy(services.type);
 
   const byType = typeRes.reduce(
@@ -295,4 +332,3 @@ export async function getAdminMetrics() {
     byType,
   };
 }
-

@@ -8,6 +8,11 @@ import {
 import * as servicesService from "./services.service";
 import * as servicesRepository from "./services.repository";
 
+const metricsQuerySchema = z.object({
+  year: z.coerce.number().int().min(2000).max(2100).optional(),
+  month: z.coerce.number().int().min(1).max(12).optional(),
+});
+
 export async function registerService(
   req: Request,
   res: Response,
@@ -122,11 +127,27 @@ export async function deleteService(
 
 export async function getMetricsController(req: Request, res: Response) {
   try {
-    const metrics = await servicesRepository.getAdminMetrics();
+    const parsed = metricsQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 });
+      return;
+    }
+    const metrics = await servicesRepository.getAdminMetrics(
+      parsed.data.year,
+      parsed.data.month,
+    );
     res.json(metrics);
   } catch (error) {
-    console.error("Erro ao buscar métricas do admin:", error);
     res.status(500).json({ message: "Erro interno ao buscar métricas" });
+  }
+}
+
+export async function getAvailablePeriodsServices(req: Request, res: Response) {
+  try {
+    const periods = await servicesRepository.getAvailablePeriods();
+    res.json(periods);
+  } catch (error) {
+    res.status(500).json({ message: "Erro interno ao buscar períodos" });
   }
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -13,12 +14,19 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-import { ClipboardList, Clock, CheckCircle2, Users, CalendarDays } from "lucide-react";
+import { ClipboardList, Clock, CheckCircle2, Users } from "lucide-react";
+
+const MONTH_LABELS: Record<number, string> = {
+  1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
+  5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
+  9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro",
+};
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { MetricsCard } from "@/components/admin/metrics-card";
+import { MetricsPeriodFilter } from "@/components/admin/metrics-period-filter";
 import { useAdminMetrics } from "@/hooks/use-admin";
+import { useAvailablePeriods } from "@/hooks/use-available-periods";
 import { SERVICE_TYPE_LABELS } from "@/lib/constants";
 import type { ServiceType } from "@friodesk/shared";
 import { useAuthStore } from "@/store/auth.store";
@@ -61,8 +69,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function AdminDashboardPage() {
-  const { metrics, loading } = useAdminMetrics();
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth() + 1);
+
   const user = useAuthStore((s) => s.user);
+  const { periods, isLoading: loadingPeriods } = useAvailablePeriods();
+  const { data: metrics, isLoading: loadingMetrics } = useAdminMetrics(year, month);
+
+  const loading = loadingMetrics || loadingPeriods;
 
   if (loading) {
     return (
@@ -97,18 +112,34 @@ export default function AdminDashboardPage() {
     { name: "Concluídos", value: metrics?.finishedServices ?? 0 },
   ];
 
+  const isEmpty = (metrics?.totalServices ?? 0) === 0;
+
   return (
     <div className="space-y-8 p-1">
       <PageHeader
         title="Visão Geral"
         description={`Bem-vindo de volta, ${user?.name?.split(" ")[0] || "Admin"}. Aqui está o resumo atual das operações do FrioDesk.`}
       >
-        <Button variant="outline" size="sm" className="h-9 gap-2 text-muted-foreground">
-          <CalendarDays className="size-4" />
-          <span>Últimos 30 dias</span>
-        </Button>
+        <MetricsPeriodFilter
+          periods={periods}
+          year={year}
+          month={month}
+          onSelect={(y, m) => { setYear(y); setMonth(m); }}
+        />
       </PageHeader>
 
+      {isEmpty ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/50 bg-muted/10 py-20 text-center animate-in fade-in duration-500">
+          <div className="flex size-14 items-center justify-center rounded-full bg-muted/50 mb-4">
+            <ClipboardList className="size-6 text-muted-foreground/60" />
+          </div>
+          <p className="font-semibold text-foreground">Nenhum serviço encontrado</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Não há registros para {MONTH_LABELS[month]} de {year}.
+          </p>
+        </div>
+      ) : (
+      <>
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricsCard
           label="Total de Serviços"
@@ -138,7 +169,6 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-7 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both delay-[500ms]">
-        
         <Card className="lg:col-span-4 border-border/40 shadow-sm overflow-hidden flex flex-col">
           <CardHeader className="border-b border-border/10 bg-muted/20 pb-4">
             <CardTitle className="text-base font-semibold">Serviços Segmentados por Tipo</CardTitle>
@@ -207,10 +237,10 @@ export default function AdminDashboardPage() {
                       <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={36} 
-                    iconType="circle" 
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
                     iconSize={10}
                     formatter={(value) => <span className="text-sm font-medium ml-1 text-foreground">{value}</span>}
                   />
@@ -219,8 +249,9 @@ export default function AdminDashboardPage() {
             </div>
           </CardContent>
         </Card>
-        
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -99,28 +99,20 @@ export function useAdminTechnicians(cursor?: string) {
   });
 }
 
-export function useAdminMetrics() {
-  const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await api.get<AdminMetrics>("/services/metrics");
-      setMetrics(res.data);
-    } catch (err) {
-      handleApiError(err, "Erro ao carregar métricas");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetch();
-  }, [fetch]);
-
-  return { metrics, loading };
+export function useAdminMetrics(year?: number, month?: number) {
+  return useQuery({
+    queryKey: ["admin", "metrics", year, month],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (year !== undefined) params.set("year", String(year));
+      if (month !== undefined) params.set("month", String(month));
+      const qs = params.toString() ? `?${params.toString()}` : "";
+      const res = await api.get<AdminMetrics>(`/services/metrics${qs}`);
+      return res.data;
+    },
+  });
 }
+
 
 export function useCreateTechnician() {
   const [loading, setLoading] = useState(false);
