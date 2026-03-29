@@ -70,11 +70,22 @@ export default function ServiceDetailPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="space-y-4 px-4 py-8 max-w-6xl mx-auto">
-        <Skeleton className="h-14 w-full md:w-1/2 lg:w-1/3 rounded-xl" />
-        <Skeleton className="h-48 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
-      </div>
+      <PageContainer>
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-64 rounded-lg" />
+          <Skeleton className="h-5 w-32 rounded-md" />
+        </div>
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-6 mt-2">
+          <div className="md:col-span-8 space-y-6">
+            <Skeleton className="h-64 w-full rounded-2xl" />
+            <Skeleton className="h-48 w-full rounded-2xl" />
+          </div>
+          <div className="md:col-span-4 space-y-6">
+            <Skeleton className="h-64 w-full rounded-2xl" />
+            <Skeleton className="h-32 w-full rounded-2xl" />
+          </div>
+        </div>
+      </PageContainer>
     );
   }
 

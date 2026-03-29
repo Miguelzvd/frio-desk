@@ -67,11 +67,12 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="space-y-8 p-1">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2">
-            <Skeleton className="h-8 w-48 rounded-lg" />
-            <Skeleton className="h-4 w-32 rounded-lg" />
+            <Skeleton className="h-9 w-44 rounded-lg" />
+            <Skeleton className="h-4 w-80 rounded-md" />
           </div>
+          <Skeleton className="h-9 w-36 rounded-md" />
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (

@@ -31,6 +31,31 @@ export default function AdminTechniciansPage() {
     setCursorStack((prev) => prev.slice(0, -1))
   }
 
+  if (isLoading && technicians.length === 0) {
+    return (
+      <div className="space-y-6 p-1">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-9 w-52 rounded-lg" />
+            <Skeleton className="h-4 w-72 rounded-md" />
+          </div>
+          <Skeleton className="h-9 w-36 rounded-md" />
+        </div>
+        <Card className="border-border/40 shadow-sm overflow-hidden">
+          <CardHeader className="border-b border-border/10 bg-muted/10 pb-4">
+            <Skeleton className="h-5 w-36 rounded-md" />
+            <Skeleton className="h-4 w-56 rounded-md" />
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-md" />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 p-1">
       <PageHeader
@@ -52,15 +77,7 @@ export default function AdminTechniciansPage() {
         </CardHeader>
         
         <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-6 space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-md" />
-              ))}
-            </div>
-          ) : (
-            <TechniciansTable technicians={technicians} />
-          )}
+          <TechniciansTable technicians={technicians} />
         </CardContent>
 
         <CardFooter className="flex items-center justify-between border-t border-border/10 bg-muted/10 px-6 py-4">
