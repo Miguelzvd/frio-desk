@@ -6,6 +6,7 @@ import { LogOut, User } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function UserNav() {
   const { user, logout } = useAuthStore();
@@ -27,6 +28,15 @@ export function UserNav() {
     logout();
     router.replace("/login");
   };
+
+  if (!user) {
+    return (
+      <div className="hidden sm:flex items-center gap-2 py-2 px-3 rounded-full">
+        <Skeleton className="size-6 rounded-full" />
+        <Skeleton className="h-3.5 w-16 rounded-md" />
+      </div>
+    );
+  }
 
   return (
     <>

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Wind } from "lucide-react";
+import { Loader2, Wind } from "lucide-react";
 import { handleApiError } from "@/lib/error-handler";
 
 import { Button } from "@/components/ui/button";
@@ -93,7 +93,8 @@ export default function LoginPage() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="size-4 animate-spin" />}
             {isSubmitting ? "Entrando..." : "Entrar"}
           </Button>
         </form>
