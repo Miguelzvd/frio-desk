@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { TechniciansTable } from "@/components/admin/technicians-table"
+import { CreateTechnicianModal } from "@/components/admin/create-technician-modal"
 import { useAdminTechnicians } from "@/hooks/use-admin"
 import { PageHeader } from "@/components/ui/page-header"
 
@@ -13,6 +14,7 @@ const PAGE_SIZE = 8
 
 export default function AdminTechniciansPage() {
   const [cursorStack, setCursorStack] = useState<string[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const currentCursor = cursorStack[cursorStack.length - 1]
   const { data, isLoading } = useAdminTechnicians(currentCursor)
 
@@ -62,7 +64,7 @@ export default function AdminTechniciansPage() {
         title="Diretório de Técnicos"
         description="Gerencie o corpo técnico e credenciais para acesso de campo."
       >
-        <Button size="sm" className="h-9 gap-2 shadow-sm font-semibold">
+        <Button size="sm" className="h-9 gap-2" onClick={() => setIsModalOpen(true)}>
           <UserPlus className="size-4" />
           <span>Adicionar Técnico</span>
         </Button>
@@ -108,6 +110,8 @@ export default function AdminTechniciansPage() {
           </div>
         </CardFooter>
       </Card>
+
+      <CreateTechnicianModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
   )
 }

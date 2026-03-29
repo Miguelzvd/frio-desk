@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleApiError } from "@/lib/error-handler";
 import api from "@/lib/api";
 import { buildCursorQuery } from "@/lib/pagination";
@@ -120,4 +120,32 @@ export function useAdminMetrics() {
   }, [fetch]);
 
   return { metrics, loading };
+}
+
+export function useCreateTechnician() {
+  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  const createTechnician = useCallback(
+    async (name: string, email: string, password: string) => {
+      try {
+        setLoading(true);
+        const res = await api.post<{ user: AdminTechnician }>("/users", {
+          name,
+          email,
+          password,
+        });
+        await queryClient.invalidateQueries({ queryKey: ["admin", "technicians"] });
+        return res.data.user;
+      } catch (err) {
+        handleApiError(err, "Erro ao criar técnico");
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [queryClient],
+  );
+
+  return { createTechnician, loading };
 }
