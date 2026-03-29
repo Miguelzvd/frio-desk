@@ -242,6 +242,42 @@ export async function findAllServicesWithUserPaginated(
   return { data, nextCursor, total };
 }
 
+export async function findAllServicesWithUserForReport(
+  typeFilter?: string,
+  statusFilter?: string,
+): Promise<ServiceWithUser[]> {
+  const filters: (SQL<unknown> | undefined)[] = [];
+
+  if (typeFilter && typeFilter !== "all") {
+    filters.push(eq(services.type, typeFilter as any));
+  }
+  if (statusFilter && statusFilter !== "all") {
+    filters.push(eq(services.status, statusFilter as any));
+  }
+
+  const queryWhere = filters.length > 0 ? and(...filters) : undefined;
+
+  return db
+    .select({
+      id: services.id,
+      userId: services.userId,
+      type: services.type,
+      status: services.status,
+      notes: services.notes,
+      createdAt: services.createdAt,
+      finishedAt: services.finishedAt,
+      user: {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      },
+    })
+    .from(services)
+    .innerJoin(users, eq(services.userId, users.id))
+    .where(queryWhere)
+    .orderBy(desc(services.createdAt));
+}
+
 export async function updateChecklistItem(
   id: string,
   checked: boolean,

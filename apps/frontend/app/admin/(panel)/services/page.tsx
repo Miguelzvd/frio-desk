@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, FileSpreadsheet } from "lucide-react"
+import { ChevronLeft, ChevronRight, FileSpreadsheet, Loader2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ServicesTable } from "@/components/admin/services-table"
 import { useAdminServices } from "@/hooks/use-admin"
+import { useReportServices } from "@/hooks/use-export-services"
 import { SERVICE_TYPE_LABELS, SERVICE_STATUS_LABELS } from "@/lib/constants"
 import type { ServiceType, ServiceStatus } from "@friodesk/shared"
 import { PageHeader } from "@/components/ui/page-header"
@@ -24,6 +25,7 @@ export default function AdminServicesPage() {
   
   const currentCursor = cursorStack[cursorStack.length - 1]
   const { data, isLoading } = useAdminServices(currentCursor, typeFilter, statusFilter)
+  const { generateReport, loading: exporting } = useReportServices({ type: typeFilter, status: statusFilter })
 
   const services = data?.data ?? []
   const total = data?.total ?? 0
@@ -89,9 +91,19 @@ export default function AdminServicesPage() {
         title="Gestão de Serviços"
         description="Supervisão e gerenciamento completo do histórico de ocorrências."
       >
-        <Button variant="outline" size="sm" className="h-9 gap-2 text-muted-foreground shadow-sm">
-          <FileSpreadsheet className="size-4" />
-          <span>Exportar Relatório</span>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-2 text-muted-foreground shadow-sm"
+          onClick={generateReport}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <FileSpreadsheet className="size-4" />
+          )}
+          <span>{exporting ? "Gerando..." : "Exportar Relatório"}</span>
         </Button>
       </PageHeader>
 

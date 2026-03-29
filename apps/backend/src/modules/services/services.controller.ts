@@ -125,7 +125,7 @@ export async function deleteService(
   }
 }
 
-export async function getMetricsController(req: Request, res: Response) {
+export async function getMetrics(req: Request, res: Response) {
   try {
     const parsed = metricsQuerySchema.safeParse(req.query);
     if (!parsed.success) {
@@ -151,11 +151,34 @@ export async function getAvailablePeriodsServices(req: Request, res: Response) {
   }
 }
 
+const reportQuerySchema = z.object({
+  type: z.string().optional(),
+  status: z.string().optional(),
+});
+
+export async function getReport(req: Request, res: Response): Promise<void> {
+  try {
+    const parsed = reportQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0].message, statusCode: 400 });
+      return;
+    }
+    const services = await servicesRepository.findAllServicesWithUserForReport(
+      parsed.data.type,
+      parsed.data.status,
+    );
+    res.json(services);
+  } catch (err) {
+    const error = err as Error & { statusCode?: number };
+    res.status(error.statusCode ?? 500).json({ error: error.message, statusCode: error.statusCode ?? 500 });
+  }
+}
+
 const toggleChecklistSchema = z.object({
   checked: z.boolean(),
 });
 
-export async function toggleChecklistItemController(
+export async function toggleServiceChecklistItem(
   req: Request,
   res: Response,
 ): Promise<void> {

@@ -9,9 +9,10 @@ router.use(authMiddleware);
 router.post("/", servicesController.registerService);
 router.get("/", servicesController.getAllServices);
 router.get("/metrics/periods", servicesController.getAvailablePeriodsServices);
-router.get("/metrics", servicesController.getMetricsController);
+router.get("/metrics", servicesController.getMetrics);
+router.get("/report", servicesController.getReport);
 
-router.patch("/:serviceId/checklist/:itemId", servicesController.toggleChecklistItemController);
+router.patch("/:serviceId/checklist/:itemId", servicesController.toggleServiceChecklistItem);
 router.get("/:id", servicesController.getServiceById);
 router.patch("/:id", servicesController.updateService);
 router.delete("/:id", servicesController.deleteService);
