@@ -149,3 +149,27 @@ export function useCreateTechnician() {
 
   return { createTechnician, loading };
 }
+
+export function useUpdateTechnician() {
+  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  const updateTechnician = useCallback(
+    async (id: string, data: { name?: string; email?: string }) => {
+      try {
+        setLoading(true);
+        const res = await api.patch<AdminTechnician>(`/users/${id}`, data);
+        await queryClient.invalidateQueries({ queryKey: ["admin", "technicians"] });
+        return res.data;
+      } catch (err) {
+        handleApiError(err, "Erro ao atualizar técnico");
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [queryClient],
+  );
+
+  return { updateTechnician, loading };
+}

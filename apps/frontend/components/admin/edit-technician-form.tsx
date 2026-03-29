@@ -8,22 +8,23 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCreateTechnician } from "@/hooks/use-admin";
+import { useUpdateTechnician } from "@/hooks/use-admin";
+import type { AdminTechnician } from "@/hooks/use-admin";
 
 const schema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido"),
-  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-interface CreateTechnicianFormProps {
+interface EditTechnicianFormProps {
+  technician: AdminTechnician;
   onSuccess?: () => void;
 }
 
-export function CreateTechnicianForm({ onSuccess }: CreateTechnicianFormProps) {
-  const { createTechnician, loading } = useCreateTechnician();
+export function EditTechnicianForm({ technician, onSuccess }: EditTechnicianFormProps) {
+  const { updateTechnician, loading } = useUpdateTechnician();
 
   const {
     register,
@@ -32,12 +33,16 @@ export function CreateTechnicianForm({ onSuccess }: CreateTechnicianFormProps) {
   } = useForm<FormValues>({
     // @ts-expect-error @hookform/resolvers
     resolver: zodResolver(schema),
+    defaultValues: {
+      name: technician.name,
+      email: technician.email,
+    },
   });
 
   const onSubmit = async (data: FormValues) => {
-    const created = await createTechnician(data.name, data.email, data.password);
-    if (created) {
-      toast.success("Técnico cadastrado com sucesso!");
+    const updated = await updateTechnician(technician.id, data);
+    if (updated) {
+      toast.success("Dados atualizados com sucesso!");
       onSuccess?.();
     }
   };
@@ -45,9 +50,9 @@ export function CreateTechnicianForm({ onSuccess }: CreateTechnicianFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="tech-name">Nome completo</Label>
+        <Label htmlFor="edit-tech-name">Nome completo</Label>
         <Input
-          id="tech-name"
+          id="edit-tech-name"
           type="text"
           autoComplete="off"
           placeholder="João da Silva"
@@ -59,9 +64,9 @@ export function CreateTechnicianForm({ onSuccess }: CreateTechnicianFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="tech-email">E-mail</Label>
+        <Label htmlFor="edit-tech-email">E-mail</Label>
         <Input
-          id="tech-email"
+          id="edit-tech-email"
           type="email"
           autoComplete="off"
           placeholder="joao@empresa.com"
@@ -72,23 +77,9 @@ export function CreateTechnicianForm({ onSuccess }: CreateTechnicianFormProps) {
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="tech-password">Senha de acesso</Label>
-        <Input
-          id="tech-password"
-          type="password"
-          autoComplete="new-password"
-          placeholder="Mínimo 6 caracteres"
-          {...register("password")}
-        />
-        {errors.password && (
-          <p className="text-xs text-destructive">{errors.password.message}</p>
-        )}
-      </div>
-
       <Button type="submit" className="w-full gap-2" disabled={loading}>
         {loading && <Loader2 className="size-4 animate-spin" />}
-        {loading ? "Cadastrando..." : "Cadastrar Técnico"}
+        {loading ? "Salvando..." : "Salvar Alterações"}
       </Button>
     </form>
   );

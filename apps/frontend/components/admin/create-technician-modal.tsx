@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TechnicianForm } from "./technician-form";
+import { CreateTechnicianForm } from "./technician-form";
 
 interface CreateTechnicianModalProps {
   open: boolean;
@@ -27,7 +27,7 @@ export function CreateTechnicianModal({ open, onOpenChange }: CreateTechnicianMo
         </DialogHeader>
 
         <div className="mt-4">
-          <TechnicianForm onSuccess={() => onOpenChange(false)} />
+          <CreateTechnicianForm onSuccess={() => onOpenChange(false)} />
         </div>
       </DialogContent>
     </Dialog>
