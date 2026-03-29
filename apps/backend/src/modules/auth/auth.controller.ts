@@ -63,7 +63,17 @@ export async function login(req: Request, res: Response): Promise<void> {
 
 export async function refresh(req: Request, res: Response): Promise<void> {
   try {
-    const parsed = refreshSchema.safeParse(req.body);
+    const tokenSource = {
+      refreshToken: req.body.refreshToken || req.cookies?.refreshToken,
+    };
+    
+    if (!tokenSource.refreshToken) {
+       res.status(401).json({ error: "Refresh token não fornecido", statusCode: 401 });
+       return;
+    }
+
+    const parsed = refreshSchema.safeParse(tokenSource);
+    
     if (!parsed.success) {
       res.status(400).json({
         error: parsed.error.issues[0].message,
@@ -72,13 +82,7 @@ export async function refresh(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const refreshToken = parsed.data.refreshToken || req.cookies?.refreshToken;
-    
-    if (!refreshToken) {
-       res.status(401).json({ error: "Refresh token não fornecido", statusCode: 401 });
-       return;
-    }
-
+    const refreshToken = parsed.data.refreshToken;
     const tokens = await authService.refresh(refreshToken);
     
     setToken(res, "accessToken", tokens.accessToken);
