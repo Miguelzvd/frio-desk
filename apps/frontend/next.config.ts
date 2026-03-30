@@ -4,6 +4,7 @@ import path from "path";
 const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ["@friodesk/shared"],
+  outputFileTracingRoot: path.resolve(__dirname, "../.."),
   turbopack: {
     root: path.resolve(__dirname, "../.."),
   },

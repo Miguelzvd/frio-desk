@@ -7,7 +7,7 @@ Equipes de manutenção de ar-condicionado enfrentam um problema recorrente: reg
 ### O que o projeto entrega
 
 - **Para o técnico:** fluxo simples e rápido para registrar qualquer tipo de atendimento (preventiva, corretiva, instalação ou inspeção) diretamente do celular, sem papel
-- **Para o gestor:** painel com métricas, histórico completo de serviços, relatórios fotográficos e visão consolidada da equipe
+- **Para o gestor:** painel com métricas filtráveis por mês e ano, histórico completo de serviços, exportação de relatórios CSV e gerenciamento completo da equipe de técnicos
 - **Para a empresa:** padronização de processos, rastreabilidade de serviços e evidência documentada de cada atendimento
 
 ## Interfaces
@@ -15,7 +15,7 @@ Equipes de manutenção de ar-condicionado enfrentam um problema recorrente: reg
 O sistema possui duas interfaces independentes:
 
 - **[Técnico](#urls-de-acesso)** — acesso mobile-first para registrar serviços, preencher checklists e fazer upload de fotos em campo
-- **[Admin](#urls-de-acesso)** — painel de gestão com métricas, listagem de todos os serviços e visão consolidada da equipe
+- **[Admin](#urls-de-acesso)** — painel de gestão com métricas filtráveis por mês/ano, listagem de todos os serviços, exportação CSV e gerenciamento de técnicos
 
 ## Stack
 
@@ -34,11 +34,19 @@ O sistema possui duas interfaces independentes:
 ```
 friodesk/
 ├── apps/
-│   ├── backend/          # API REST (Node.js + Express)
-│   └── frontend/         # Interface web (Next.js)
+│   ├── backend/
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml       # prod: backend + postgres
+│   │   ├── docker-compose.dev.yml   # dev: backend + postgres + hot reload
+│   │   └── .env.example
+│   └── frontend/
+│       ├── Dockerfile
+│       ├── docker-compose.yml       # prod: next.js standalone
+│       ├── docker-compose.dev.yml   # dev: next.js + hot reload
+│       └── .env.example
 ├── packages/
 │   └── shared/           # Tipos e schemas Zod compartilhados
-├── docker-compose.yml
+├── docker-compose.yml    # postgres standalone (para dev local sem Docker no app)
 ├── .env.example
 └── README.md
 ```
@@ -50,10 +58,16 @@ friodesk/
 ### Pré-requisitos
 
 - Node.js 20+
-- pnpm 9+ (`npm install -g pnpm`)
-- Docker + Docker Compose (apenas para o banco)
+- pnpm 10+ (`npm install -g pnpm`)
+- Docker + Docker Compose
 
-### 1. Clonar e instalar dependências
+---
+
+### Opção A — Local (sem Docker no app)
+
+Útil para desenvolvimento com hot reload nativo e debugging direto.
+
+#### 1. Clonar e instalar dependências
 
 ```bash
 git clone <repo-url>
@@ -61,16 +75,16 @@ cd friodesk
 pnpm install
 ```
 
-### 2. Configurar variáveis de ambiente
+#### 2. Configurar variáveis de ambiente
 
 **Backend:**
 
 ```bash
-cp .env.example apps/backend/.env
+cp apps/backend/.env.example apps/backend/.env
 # Edite apps/backend/.env com seus valores
 ```
 
-Para desenvolvimento local, o `.env` mínimo funcional é:
+`.env` mínimo funcional:
 
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/friodesk
@@ -86,7 +100,7 @@ STORAGE_PROVIDER=local
 **Frontend:**
 
 ```bash
-cp apps/frontend/.env.local.example apps/frontend/.env.local
+cp apps/frontend/.env.example apps/frontend/.env.local
 ```
 
 O arquivo gerado já está correto para desenvolvimento local:
@@ -95,22 +109,22 @@ O arquivo gerado já está correto para desenvolvimento local:
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### 3. Subir o banco de dados
+#### 3. Subir o banco de dados
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-### 4. Rodar as migrations
+#### 4. Rodar as migrations
 
 ```bash
-pnpm migrate
+cd apps/backend && pnpm migrate
 ```
 
-### 5. Popular o banco com dados de exemplo
+#### 5. Popular o banco com dados de exemplo
 
 ```bash
-pnpm seed
+cd apps/backend && pnpm seed
 ```
 
 Isso criará:
@@ -119,19 +133,70 @@ Isso criará:
 - 14 serviços (8 finalizados + 6 em aberto)
 - Checklists e fotos de exemplo
 
-### 6. Iniciar o backend
+#### 6. Iniciar o backend
 
 ```bash
 pnpm dev:backend
 # API disponível em http://localhost:3001
 ```
 
-### 7. Iniciar o frontend
+#### 7. Iniciar o frontend
 
 ```bash
 pnpm dev:frontend
 # App disponível em http://localhost:3000
 ```
+
+---
+
+### Opção B — Docker (tudo containerizado)
+
+Frontend e backend são **independentes** — cada um tem seu próprio compose. Isso permite subir apenas o que precisar.
+
+#### Backend + Banco de Dados
+
+```bash
+cd apps/backend
+cp .env.example .env
+# Edite .env: substitua JWT_SECRET, JWT_REFRESH_SECRET por strings seguras
+# Garanta que DATABASE_URL usa "postgres" como host (não "localhost"):
+# DATABASE_URL=postgresql://user:password@postgres:5432/friodesk
+
+# Dev (com hot reload)
+docker compose -f docker-compose.dev.yml up --build
+
+# Produção
+docker compose up --build -d
+```
+
+#### Migrations e Seed (manual, quando necessário)
+
+```bash
+# Dev
+docker compose -f docker-compose.dev.yml exec backend pnpm migrate
+docker compose -f docker-compose.dev.yml exec backend pnpm seed
+
+# Prod
+docker compose exec backend pnpm migrate
+```
+
+#### Frontend
+
+```bash
+cd apps/frontend
+cp .env.example .env
+# Edite .env: defina NEXT_PUBLIC_API_URL com a URL do backend
+
+# Dev (com hot reload)
+docker compose -f docker-compose.dev.yml up --build
+
+# Produção
+docker compose up --build -d
+```
+
+> **Nota macOS/Windows:** o hot reload do frontend usa `WATCHPACK_POLLING=1` automaticamente no compose dev — não é necessário nenhuma configuração adicional.
+
+---
 
 ### URLs de acesso
 
@@ -144,36 +209,16 @@ pnpm dev:frontend
 
 ---
 
-## Rodando com Docker (tudo containerizado)
-
-Para subir frontend, backend e banco de dados com um único comando:
-
-```bash
-cp .env.example .env
-# Edite .env com seus valores antes de continuar
-docker-compose up --build
-```
-
-### URLs de acesso
-
-| Serviço  | URL                          |
-| -------- | ---------------------------- |
-| Frontend | http://localhost:3000        |
-| Backend  | http://localhost:3001        |
-| Health   | http://localhost:3001/health |
-
----
-
 ## Credenciais de Acesso (após seed)
 
 Todos os usuários criados pelo seed têm a senha: **`123456`**
 
 | Email                            | Role    | Nome           |
 | -------------------------------- | ------- | -------------- |
-| `admin@friodesk.com`          | Admin   | Administrador  |
-| `joao.silva@friodesk.com`     | Técnico | João Silva     |
-| `maria.santos@friodesk.com`   | Técnico | Maria Santos   |
-| `pedro.oliveira@friodesk.com` | Técnico | Pedro Oliveira |
+| `admin@friodesk.com`             | Admin   | Administrador  |
+| `joao.silva@friodesk.com`        | Técnico | João Silva     |
+| `maria.santos@friodesk.com`      | Técnico | Maria Santos   |
+| `pedro.oliveira@friodesk.com`    | Técnico | Pedro Oliveira |
 
 ---
 
@@ -192,8 +237,11 @@ Todos os usuários criados pelo seed têm a senha: **`123456`**
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary  | Nome do cloud no Cloudinary                       |
 | `CLOUDINARY_API_KEY`    | Cloudinary  | Chave de API do Cloudinary                        |
 | `CLOUDINARY_API_SECRET` | Cloudinary  | Segredo de API do Cloudinary                      |
+| `POSTGRES_USER`         | Docker      | Usuário do PostgreSQL (compose prod)              |
+| `POSTGRES_PASSWORD`     | Docker      | Senha do PostgreSQL (compose prod)                |
+| `POSTGRES_DB`           | Docker      | Nome do banco (compose prod)                      |
 
-### Frontend (`apps/frontend/.env.local`)
+### Frontend (`apps/frontend/.env` ou `.env.local`)
 
 | Variável              | Obrigatório | Descrição               |
 | --------------------- | ----------- | ----------------------- |
@@ -227,34 +275,43 @@ pnpm test:backend
 
 ### Services (requer JWT)
 
-| Método | Rota                                        | Descrição                                           |
-| ------ | ------------------------------------------- | --------------------------------------------------- |
-| POST   | `/services`                                 | Criar serviço + checklist automático                |
-| GET    | `/services`                                 | Listar serviços (paginado, filtrável por tipo/status) |
-| GET    | `/services/metrics`                         | Métricas de serviços do usuário                     |
-| GET    | `/services/:id`                             | Detalhe com checklist e fotos                       |
-| PATCH  | `/services/:id`                             | Atualizar serviço                                   |
-| DELETE | `/services/:id`                             | Remover serviço                                     |
-| PATCH  | `/services/:serviceId/checklist/:itemId`    | Marcar/desmarcar item do checklist                  |
+| Método | Rota                                     | Descrição                                            |
+| ------ | ---------------------------------------- | ---------------------------------------------------- |
+| POST   | `/services`                              | Criar serviço + checklist automático                 |
+| GET    | `/services`                              | Listar serviços (paginado, filtrável por tipo/status) |
+| GET    | `/services/metrics`                      | Métricas de serviços do usuário                      |
+| GET    | `/services/:id`                          | Detalhe com checklist e fotos                        |
+| PATCH  | `/services/:id`                          | Atualizar serviço                                    |
+| DELETE | `/services/:id`                          | Remover serviço                                      |
+| PATCH  | `/services/:serviceId/checklist/:itemId` | Marcar/desmarcar item do checklist                   |
 
 ### Photos (requer JWT)
 
-| Método | Rota                             | Descrição                            |
-| ------ | -------------------------------- | ------------------------------------ |
-| GET    | `/services/:id/photos`           | Listar fotos do serviço              |
-| POST   | `/services/:id/photos`           | Upload de foto (multipart/form-data) |
-| DELETE | `/services/:id/photos/:photoId`  | Remover foto                         |
+| Método | Rota                            | Descrição                            |
+| ------ | ------------------------------- | ------------------------------------ |
+| GET    | `/services/:id/photos`          | Listar fotos do serviço              |
+| POST   | `/services/:id/photos`          | Upload de foto (multipart/form-data) |
+| DELETE | `/services/:id/photos/:photoId` | Remover foto                         |
 
-### Users (requer JWT)
+### Admin — Serviços (requer JWT + role Admin)
 
-| Método | Rota                    | Descrição                          | Role  |
-| ------ | ----------------------- | ---------------------------------- | ----- |
-| GET    | `/users/technicians`    | Listar técnicos cadastrados        | —     |
-| GET    | `/users`                | Listar todos os usuários           | Admin |
-| GET    | `/users/:id`            | Detalhe de um usuário              | Admin |
-| GET    | `/users/:id/services`   | Serviços de um usuário             | Admin |
-| PATCH  | `/users/:id`            | Atualizar usuário                  | Admin |
-| DELETE | `/users/:id`            | Remover usuário                    | Admin |
+| Método | Rota                      | Query params           | Descrição                                          |
+| ------ | ------------------------- | ---------------------- | -------------------------------------------------- |
+| GET    | `/services/admin`         | `type`, `status`, `page` | Listar todos os serviços de todos os técnicos    |
+| GET    | `/services/admin/metrics` | `year`, `month`        | Métricas gerais filtráveis por mês e ano           |
+| GET    | `/services/report`        | `type`, `status`       | Exportar serviços como CSV (download automático)   |
+
+### Admin — Usuários (requer JWT + role Admin)
+
+| Método | Rota                  | Descrição                                       |
+| ------ | --------------------- | ----------------------------------------------- |
+| GET    | `/users`              | Listar todos os usuários                        |
+| GET    | `/users/technicians`  | Listar técnicos cadastrados                     |
+| GET    | `/users/:id`          | Detalhe de um usuário                           |
+| GET    | `/users/:id/services` | Serviços de um usuário                          |
+| POST   | `/users`              | Criar novo técnico (nome, email, senha)         |
+| PATCH  | `/users/:id`          | Atualizar nome e email de um técnico            |
+| DELETE | `/users/:id`          | Remover usuário                                 |
 
 ---
 
@@ -273,21 +330,24 @@ O técnico usa a aplicação em campo, registrando cada atendimento do início a
 
 ## Fluxo do Admin
 
-O administrador tem visão completa da operação, sem interferir nos atendimentos dos técnicos.
+O administrador tem visão completa da operação e controle total sobre a equipe de técnicos.
 
 1. Acessa `/admin/login` com credenciais de nível admin
-2. No dashboard, visualiza métricas gerais: total de serviços, distribuição por tipo e status, total de técnicos
-3. Navega pela listagem completa de serviços de todos os técnicos em `/admin/services`
-4. Filtra serviços por tipo ou por status conforme necessário
-5. Acessa o detalhe de qualquer serviço para ver checklist e fotos (somente leitura)
-6. Visualiza o relatório completo de qualquer atendimento
-7. Consulta a listagem de técnicos cadastrados em `/admin/technicians`
+2. No dashboard, visualiza métricas gerais: total de serviços, serviços em andamento, concluídos, total de técnicos ativos — além de dois gráficos (serviços por tipo e distribuição de status)
+3. Filtra as métricas do dashboard por **ano e mês** usando dois seletores dropdown — ao selecionar um ano, o mês é ajustado automaticamente para o primeiro disponível naquele ano
+4. Navega pela listagem completa de serviços de todos os técnicos em `/admin/services`
+5. Filtra serviços por **tipo** (preventiva, corretiva, instalação, inspeção) ou por **status** (aberto, finalizado) através de dropdowns na página
+6. Exporta a listagem como **arquivo CSV** clicando em "Exportar Relatório" — os filtros de tipo e status ativos são aplicados na exportação. O arquivo gerado inclui: técnico, e-mail, tipo, status, data de abertura e data de conclusão
+7. Acessa o detalhe de qualquer serviço para ver checklist e fotos (somente leitura)
+8. Em `/admin/technicians`, visualiza a equipe cadastrada e gerencia técnicos:
+   - **Criar:** clica em "Adicionar Técnico", preenche nome, e-mail e senha em um modal e confirma com "Cadastrar Técnico"
+   - **Editar:** clica na ação da linha na tabela, edita nome e e-mail no modal (senha não é alterável por aqui) e confirma com "Salvar Alterações"
 
 ---
 
 ## Formulários e Validações
 
-**Registro**
+**Registro / Criação de técnico (admin)**
 
 | Campo | Regra                            |
 | ----- | -------------------------------- |
@@ -301,6 +361,15 @@ O administrador tem visão completa da operação, sem interferir nos atendiment
 | ----- | --------------------------- |
 | Email | Obrigatório, formato válido |
 | Senha | Obrigatório                 |
+
+**Edição de técnico (admin)**
+
+| Campo | Regra                                        |
+| ----- | -------------------------------------------- |
+| Nome  | Obrigatório, mínimo 2 caracteres             |
+| Email | Obrigatório, formato válido                  |
+
+> Senha não é editável pelo modal de edição.
 
 **Novo serviço**
 
@@ -320,3 +389,12 @@ O administrador tem visão completa da operação, sem interferir nos atendiment
 | Campo       | Regra    |
 | ----------- | -------- |
 | Observações | Opcional |
+
+**Filtro de métricas (admin dashboard)**
+
+| Campo | Comportamento                                                                 |
+| ----- | ----------------------------------------------------------------------------- |
+| Ano   | Dropdown com anos que possuem serviços registrados, ordenado do mais recente  |
+| Mês   | Dropdown com meses disponíveis no ano selecionado (nomes em português)        |
+
+> Ao selecionar um ano, o mês é automaticamente ajustado para o primeiro disponível naquele ano.
