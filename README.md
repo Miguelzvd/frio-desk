@@ -87,12 +87,25 @@ cp apps/backend/.env.example apps/backend/.env
 `.env` mínimo funcional:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/friodesk
-JWT_SECRET=qualquer_string_longa_aqui
-JWT_REFRESH_SECRET=outra_string_longa_aqui
+# Banco de dados — em dev, "postgres" resolve via nome do serviço Docker
+DATABASE_URL=postgresql://user:password@postgres:5432/friodesk
+
+# Autenticação — substituir por strings longas e aleatórias
+JWT_SECRET=changeme
+JWT_REFRESH_SECRET=changeme
+
+# Servidor
 PORT=3001
 APP_URL=http://localhost:3001
+
+# Storage: "local" (volume Docker) ou "cloudinary"
 STORAGE_PROVIDER=local
+
+# PostgreSQL — usado pelo docker-compose.yml de produção
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=friodesk
+
 ```
 
 > `STORAGE_PROVIDER=local` salva uploads na pasta `apps/backend/uploads/` sem precisar de Cloudinary.
