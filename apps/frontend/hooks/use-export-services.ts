@@ -67,7 +67,6 @@ export function useReportServices({ type, status }: UseExportServicesOptions) {
   const isGenerating = useRef(false);
 
   const generateReport = async () => {
-    // Guard síncrono — bloqueia re-entradas antes do primeiro re-render
     if (isGenerating.current) return;
     isGenerating.current = true;
 
@@ -81,14 +80,18 @@ export function useReportServices({ type, status }: UseExportServicesOptions) {
       const res = await api.get<ExportService[]>(`/services/report${qs}`);
       const csv = toCSV(res.data);
       const date = new Date().toISOString().slice(0, 10);
-      // triggerDownload é síncrono — loading só cai após o arquivo ser oferecido ao browser
       triggerDownload(csv, `relatorio-servicos-${date}.csv`);
     } catch (err) {
       handleApiError(err, "Erro ao gerar relatório");
-    } finally {
       isGenerating.current = false;
       setLoading(false);
+      return;
     }
+
+    setTimeout(() => {
+      isGenerating.current = false;
+      setLoading(false);
+    }, 1000);
   };
 
   return { generateReport, loading };
